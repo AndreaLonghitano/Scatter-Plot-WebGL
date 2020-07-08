@@ -16,12 +16,11 @@ const KEY_CODE = {
   "ARROWRIGHT":39
 };
 
-const MAX_MOVEMENT_X=100.0;
-const MAX_MOVEMENT_Z=500.0; 
-const MAX_MOVEMENT_Y=300.0;
+const MAX_MOVEMENT_X=250.0;
+const MAX_MOVEMENT_Z=250.0; 
+const MAX_MOVEMENT_Y=250.0;
 
-const SCALE_FACTOR=50;
-
+const SCALE_FACTOR=250;
 
 
 var dataset,classes; 
@@ -57,7 +56,7 @@ var canvas=document.getElementById('canvas');
 
 
 // camera
-var cx = 5.0,cy=5.0,cz=40.0;
+var cx =0.0,cy=0.0,cz=200.0;
 var rvx = 0.0,rvy=0,rvz=0;
 var vx=0,vy=0,vz=0;
 var elevation=-20.0,angle=0;
@@ -95,9 +94,9 @@ var vao={};
 
 var lines_position=[
       0,0,0,
-      0,1,0,
-      0,0,0,
       1,0,0,
+      0,0,0,
+      0,1,0,
       0,0,0,
       0,0,1
 ];

@@ -20,7 +20,7 @@
 
 
     // Create and link the first group of shader
-    await utils.loadFiles([shaderDir + 'vs.glsl', shaderDir + 'fs.glsl'], function (shaderText) {
+    await utils.loadFiles([shaderDir + 'vs_obj.glsl', shaderDir + 'fs_obj.glsl'], function (shaderText) {
           programs[0]=utils.createAndCompileShaders(gl,shaderText);
     });
 
@@ -69,7 +69,6 @@
   programs[0].materialDiffColorHandle = gl.getUniformLocation(programs[0], 'mDiffColor');
   programs[0].lightDirectionHandle = gl.getUniformLocation(programs[0], 'lightDirection');
   programs[0].lightColorHandle = gl.getUniformLocation(programs[0], 'lightColor');
-  programs[0].normalMatrixPositionHandle = gl.getUniformLocation(programs[0], 'nMatrix');
   programs[0].lightDirMatrixPositionHandle = gl.getUniformLocation(programs[0], 'lightDirMatrix');
 
   gl.useProgram(programs[1]);
@@ -79,7 +78,7 @@
 
   
 
-  perspectiveMatrix = utils.MakePerspective(90, gl.canvas.width/gl.canvas.height, 0.1, 100);
+  perspectiveMatrix = utils.MakePerspective(90, gl.canvas.width/gl.canvas.height, 0.1, 1000);
 
 
   createVaoObjects(programs[0],"Sphere",vertices=sphere.vertices,normals=sphere.vertexNormals,indices=sphere.indices);
@@ -145,39 +144,29 @@ function animate(){
     gl.clearColor(0.85, 0.85, 0.85, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     animate();
-
     computeViewMatrix();
-
-
-    var lightDirMatrix = utils.invertMatrix(utils.transposeMatrix(viewMatrix)); // we need to compute it of course and just pass it to the fragment shader
-
-
     showAxes();
-
-
-
-
     gl.useProgram(programs[0]);
+
     for(i = 0; i < dataset.length; i++){
       var objSelected=$('#class'+dataset[i].class).val();
       var ele=listOfPossibleModels[objSelected];
 
-
-      
-      var worldMatrix=utils.MakeWorld(dataset[i].x*10,dataset[i].y*10,dataset[i].z*10,0,0,0,0.4);
+      var worldMatrix=utils.MakeWorld(dataset[i].x*50,dataset[i].y*50,dataset[i].z*50,0,0,0,2.0);
 
       var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
       var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
-      var cubeNormalMatrix = utils.invertMatrix(utils.transposeMatrix(worldViewMatrix));
+
+      var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
+      var directionalLightTrasformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
 
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
       
-      gl.uniformMatrix4fv(programs[0].normalMatrixPositionHandle, gl.FALSE, utils.transposeMatrix(cubeNormalMatrix));
 
-      gl.uniformMatrix4fv(programs[0].lightDirMatrixPositionHandle, gl.FALSE, utils.transposeMatrix(lightDirMatrix)); // send also this matrix remebemr to do the inverse because its coloumn wise
       gl.uniform3fv(programs[0].materialDiffColorHandle, cubeMaterialColor);
       gl.uniform3fv(programs[0].lightColorHandle,  directionalLightColor);
-      gl.uniform3fv(programs[0].lightDirectionHandle,  directionalLight);
+      gl.uniform3fv(programs[0].lightDirectionHandle,  directionalLightTrasformed);
+
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0 );
     }
@@ -240,13 +229,6 @@ function computeViewMatrix(){
 window.addEventListener('keyup', callbacks.onkeyUp,false);
 window.addEventListener('keydown',callbacks.onKeyDown,false);
 
-/* 
-canvas.addEventListener("mousedown", callbacks.doMouseDown, false);
-canvas.addEventListener("mouseup", callbacks.doMouseUp, false);
-canvas.addEventListener("mousemove", callbacks.doMouseMove, false);
-canvas.addEventListener("mousewheel", callbacks.doMouseWheel, false);
-*/
-
 
 function createUiModelClass(){
   classes.forEach((i)=>{
@@ -281,54 +263,52 @@ function createUiModelClass(){
 
 
 function showAxes(){
-    gl.useProgram(programs[1]);
-    var worldMatrix=utils.MakeWorld(0,0,0,0,0,0,SCALE_FACTOR);
-    var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
-    var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
-    gl.uniformMatrix4fv(programs[1].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
-    gl.uniformMatrix3fv(programs[1].color_axes,gl.FALSE,colorAxes);
-    gl.bindVertexArray(vao['Lines']);
-    gl.drawArrays(gl.LINES, 0, 6);
-    if (showNegativeAxes){
-      gl.drawArrays(gl.LINES,6,6);
-    }
+  gl.useProgram(programs[1]);
+  var worldMatrix=utils.MakeWorld(0,0,0,0,0,0,SCALE_FACTOR);
+  var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
+  var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
+  gl.uniformMatrix4fv(programs[1].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
+  gl.uniformMatrix3fv(programs[1].color_axes,gl.FALSE,colorAxes);
+  gl.bindVertexArray(vao['Lines']);
+  gl.drawArrays(gl.LINES, 0, 6);
+  if (showNegativeAxes){
+    gl.drawArrays(gl.LINES,6,6);
+  }
 
-    showPyramid(1);
-    if (showNegativeAxes){
-      showPyramid(-1);
-    }
+  showPyramid(1);
+  if (showNegativeAxes){
+    showPyramid(-1);
+  }
 
 
 }
 
 function showPyramid(negative_axes){
-    // show Pyramid
-    for(var i=0;i<3;i++){
-      gl.bindVertexArray(vao['Pyramid']);
-        switch(i){
-          //x
-          case 0:
-            var worldMatrix=utils.MakeWorld(SCALE_FACTOR*negative_axes,0,0,0,0,90*negative_axes,0.2);
-          break;
-          //y
-          case 1:
-            var worldMatrix=utils.MakeWorld(0,SCALE_FACTOR*negative_axes,0,((180)*(1-negative_axes))/2,0,0,0.2);
-          break;
-          //z
-          case 2:
-            var worldMatrix=utils.MakeWorld(0,0,SCALE_FACTOR*negative_axes,90*negative_axes,0,0,0.2);
-          break;
-        }
-      var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
-      var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
-      gl.uniformMatrix4fv(programs[1].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
-      gl.uniformMatrix3fv(programs[1].color_axes,gl.FALSE,colorAxes);
-      gl.drawElements(gl.TRIANGLES, pyramid.indices.length, gl.UNSIGNED_SHORT, 0);
+  // show Pyramid
+  for(var i=0;i<3;i++){
+    gl.bindVertexArray(vao['Pyramid']);
+      switch(i){
+        //x
+        case 0:
+          var worldMatrix=utils.MakeWorld(SCALE_FACTOR*negative_axes,0,0,0,0,90*negative_axes,2.0);
+        break;
+        //y
+        case 1:
+          var worldMatrix=utils.MakeWorld(0,SCALE_FACTOR*negative_axes,0,((180)*(1-negative_axes))/2,0,0,2.0);
+        break;
+        //z
+        case 2:
+          var worldMatrix=utils.MakeWorld(0,0,SCALE_FACTOR*negative_axes,90*negative_axes,0,0,2.0);
+        break;
       }
+    var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
+    var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
+    gl.uniformMatrix4fv(programs[1].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
+    gl.uniformMatrix3fv(programs[1].color_axes,gl.FALSE,colorAxes);
+    gl.drawElements(gl.TRIANGLES, pyramid.indices.length, gl.UNSIGNED_SHORT, 0);
+    }
 
 }
-
-
 
 
 
