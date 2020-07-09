@@ -76,9 +76,14 @@
   programs[0].normalAttributeLocation = gl.getAttribLocation(programs[0], "inNormal");  
   programs[0].matrixLocation = gl.getUniformLocation(programs[0], "matrix");
   programs[0].materialDiffColorHandle = gl.getUniformLocation(programs[0], 'mDiffColor');
-  programs[0].lightDirectionHandle = gl.getUniformLocation(programs[0], 'lightDirection');
-  programs[0].lightColorHandle = gl.getUniformLocation(programs[0], 'lightColor');
+  programs[0].lightDirectionHandle = gl.getUniformLocation(programs[0], 'L1_lightDirection');
+  programs[0].lightColorHandle = gl.getUniformLocation(programs[0], 'L1_lightColor');
+  programs[0].AmbientMatColHandle = gl.getUniformLocation(programs[0], "ambientMatColor");
+  programs[0].AmbientLightColHandle = gl.getUniformLocation(programs[0], "ambientLightColor");
+  programs[0].specShineHandle = gl.getUniformLocation(programs[0], "SpecShine");
+  programs[0].specularColorHandle = gl.getUniformLocation(programs[0], "specularColor");
   programs[0].lightDirMatrixPositionHandle = gl.getUniformLocation(programs[0], 'lightDirMatrix');
+  programs[0].eyePosHandler = gl.getUniformLocation(programs[0], "eyePos");
 
   gl.useProgram(programs[1]);
   programs[1].positionAttributeLocation = gl.getAttribLocation(programs[1], "inPosition");
@@ -178,8 +183,13 @@ function animate(){
       var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
       var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
 
+      var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix),[cx,cy,cz,1.0]);
+      
+
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
       var directionalLightTrasformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
+
+
 
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
       
@@ -187,6 +197,11 @@ function animate(){
       gl.uniform3fv(programs[0].materialDiffColorHandle, cubeMaterialColor);
       gl.uniform3fv(programs[0].lightColorHandle,  directionalLightColor);
       gl.uniform3fv(programs[0].lightDirectionHandle,  directionalLightTrasformed);
+      gl.uniform3fv(programs[0].AmbientLightColHandle,  directionalLightColor);
+      gl.uniform3fv(programs[0].AmbientMatColHandle, cubeMaterialColor);
+      gl.uniform1f(programs[0].specShineHandle, SpecShine);
+      gl.uniform3fv(programs[0].specularColorHandle, specularColor);
+      gl.uniform3fv(programs[0].eyePosUniform, eyePosTransformed);
 
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0 );

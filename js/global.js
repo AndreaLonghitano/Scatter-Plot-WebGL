@@ -88,6 +88,9 @@ var cubeMaterialColor = [0.5, 0.5, 0.5];
 var cubeMaterialColor2 = [1.0, 1.0, 0.0];
 var colorAxes=[0.5, 0.5, 0.5];
 
+var SpecShine = 1;
+var specularColor = [1.0,  1.0,  1.0];
+
 var lastUpdateTime = (new Date).getTime();
   
 var vao={};
