@@ -104,6 +104,19 @@ var lines_position=[
 var negatedArray = lines_position.map(value => -value);
 var lines_position=lines_position.concat(negatedArray);
 
+
+var min_x=+Infinity;
+var max_x=-+Infinity;
+var min_y=+Infinity;
+var max_y=-+Infinity;
+var max_z=-Infinity;
+var min_z=+Infinity;
+var x_range=document.getElementById('x_range');
+var y_range=document.getElementById('y_range');
+var z_range=document.getElementById('z_range');
+
+
+
   
 
  

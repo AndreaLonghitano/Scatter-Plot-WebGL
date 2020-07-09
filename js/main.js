@@ -2,6 +2,7 @@
 
     var cubeObjStr,sphereObjStr;
 
+
     gl = canvas.getContext("webgl2");
     if (!gl) {
         swal({
@@ -33,13 +34,21 @@
     await utils.get_json(baseDir+"/model/irisCG.json", function(jsonFile){
         dataset = jsonFile.values;
         classes=[...new Set(dataset.map(item => item.class))];
-    });
+  });
 
-
+  dataset.forEach((element,index)=> {
+    min_x=Math.min(dataset[index].x,min_x)
+    max_x=Math.max(dataset[index].x,max_x);
+    min_z=Math.min(dataset[index].z,min_z)
+    max_z=Math.max(dataset[index].z,max_z);
+    min_y=Math.min(dataset[index].y,min_y)
+    max_y=Math.max(dataset[index].y,max_y);
+});
     // centroids for k-means
     await utils.get_json(baseDir+"/model/centroids.json", function(jsonFile){
       centroids = jsonFile.data;
   });
+
 
 
   utils.showCanvas();
@@ -75,6 +84,8 @@
   programs[1].positionAttributeLocation = gl.getAttribLocation(programs[1], "inPosition");
   programs[1].matrixLocation = gl.getUniformLocation(programs[1], "matrix");
   programs[1].color_axes = gl.getUniformLocation(programs[1], "color_axes");
+
+
 
   
 
@@ -149,6 +160,16 @@ function animate(){
     gl.useProgram(programs[0]);
 
     for(i = 0; i < dataset.length; i++){
+
+      if(dataset[i].x < (min_x+(x_range.valueLow*(max_x-min_x)/100)) || dataset[i].x> (x_range.valueHigh*(max_x-min_x)/100) || 
+          dataset[i].y < (min_y+(y_range.valueLow*(max_y-min_y)/100)) || dataset[i].y > (y_range.valueHigh*(max_y-min_y)/100) ||
+          dataset[i].z < (min_z+(z_range.valueLow*(max_z-min_z)/100)) || dataset[i].z > (z_range.valueHigh*(max_z-min_z)/100)){
+          continue;
+      }
+
+
+      
+
       var objSelected=$('#class'+dataset[i].class).val();
       var ele=listOfPossibleModels[objSelected];
 
