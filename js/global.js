@@ -76,8 +76,8 @@ var cubeNormalMatrix;
 var cubeWorldMatrix = new Array();    //One world matric for each cube...
 
 //define directional light
-var dirLightAlpha = -utils.degToRad(60);
-var dirLightBeta  = -utils.degToRad(120);
+var dirLightAlpha = utils.degToRad(90);
+var dirLightBeta  = utils.degToRad(0);
 
 var directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
             Math.sin(dirLightAlpha),

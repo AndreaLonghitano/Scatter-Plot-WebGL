@@ -2,37 +2,42 @@
 <html lang="en-US">
 
 <head>
-    <link rel="shortcut icon" href="icon/icon.jpg">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Scatter Plot</title>
-    <link type="text/css" href="./css/style.css" rel="stylesheet">
-    <link type="text/css" href="./css/multirange.css" rel="stylesheet">
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="./lib/multirange.js"></script>
-  </head>
+  <link rel="shortcut icon" href="icon/icon.jpg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scatter Plot</title>
+  <link type="text/css" href="./css/style.css" rel="stylesheet">
+  <link type="text/css" href="./css/multirange.css" rel="stylesheet">
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <script src="./lib/multirange.js"></script>
+</head>
 
 
 <body>
   <div class="container-fluid" id="legend">
     <div class="row">
       <div class="col-12 command">
-         <b>Command List</b>
+        <b>Command List</b>
       </div>
     </div>
     <div class="row justify-content-center">
-    <div class="col-12">
-    <div class="form-check">
-      <input type="checkbox" class="form-check-input" id="showNegativeAxes" checked>
-      <label class="form-check-label" for="showNegativeAxes">Show Negative Axes</label>
+      <div class="col-12">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="showNegativeAxes" checked>
+          <label class="form-check-label" for="showNegativeAxes">Show Negative Axes</label>
+        </div>
+      </div>
     </div>
-  </div>
-    </div>
-    <hr/>
+    <hr />
 
     <div class="row justify-content-center">
       <div class="col-6 d-flex justify-content-center">
@@ -41,116 +46,130 @@
       <div class="col-6 command">
         Full Screen
       </div>
-  </div>
-  <hr/>
+    </div>
+    <hr />
     <div class="row">
-         <div class="col-6">
-           <div class="row">
-            <div class="col-4 ">
-              <button type="button" class="btn btn-light" id="Q">Q</button>
-            </div>
-            <div class="col-4 ">
-              <button type="button" class="btn btn-light" id="W">W</button>
-            </div>
-            <div class="col-4 ">
-              <button type="button" class="btn btn-light" id="E">E</button>
-            </div>
-           </div>
-           <div class="row">
-            <div class="col-4">
-              <button type="button" class="btn btn-light" id="A">A</button>
-            </div>
-            <div class="col-4">
-              <button type="button" class="btn btn-light" id="S">S</button>
-            </div>
-            <div class="col-4">
-              <button type="button" class="btn btn-light" id="D">D</button>
-            </div>
-           </div> 
-         </div>
-         <div class="col-6 command">
-            Move camera
-         </div>
-      </div>
-      <hr>
-      <div class="row">
-        <div class="col-6">
-          <div class="row justify-content-center">
-           <div class="col-4 ">
-             <button type="button" class="btn btn-light" id="ARROWUP">&#8593</button>
-           </div>
+      <div class="col-6">
+        <div class="row">
+          <div class="col-4 ">
+            <button type="button" class="btn btn-light" id="Q">Q</button>
           </div>
-          <div class="row">
-           <div class="col-4">
-             <button type="button" class="btn btn-light" id="ARROWLEFT">&#8592</button>
-           </div>
-           <div class="col-4">
-             <button type="button" class="btn btn-light" id="ARROWDOWN">&#8595</button>
-           </div>
-           <div class="col-4">
-             <button type="button" class="btn btn-light" id="ARROWRIGHT">&#8594</button>
-           </div>
-          </div> 
+          <div class="col-4 ">
+            <button type="button" class="btn btn-light" id="W">W</button>
+          </div>
+          <div class="col-4 ">
+            <button type="button" class="btn btn-light" id="E">E</button>
+          </div>
         </div>
-        <div class="col-6 command">
-           Rotate camera
-        </div>
-     </div>
-      <hr/>
-      <div class="row">
-        <div class="col-6 d-flex justify-content-center">
-          <button type="button" class="btn btn-light" id="P">P</button>
-        </div>
-        <div class="col-6 command">
-          PCA
+        <div class="row">
+          <div class="col-4">
+            <button type="button" class="btn btn-light" id="A">A</button>
+          </div>
+          <div class="col-4">
+            <button type="button" class="btn btn-light" id="S">S</button>
+          </div>
+          <div class="col-4">
+            <button type="button" class="btn btn-light" id="D">D</button>
+          </div>
         </div>
       </div>
+      <div class="col-6 command">
+        Move camera
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-6">
+        <div class="row justify-content-center">
+          <div class="col-4 ">
+            <button type="button" class="btn btn-light" id="ARROWUP">&#8593</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            <button type="button" class="btn btn-light" id="ARROWLEFT">&#8592</button>
+          </div>
+          <div class="col-4">
+            <button type="button" class="btn btn-light" id="ARROWDOWN">&#8595</button>
+          </div>
+          <div class="col-4">
+            <button type="button" class="btn btn-light" id="ARROWRIGHT">&#8594</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 command">
+        Rotate camera
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col-6 d-flex justify-content-center">
+        <button type="button" class="btn btn-light" id="P">P</button>
+      </div>
+      <div class="col-6 command">
+        PCA
+      </div>
+    </div>
 
-      <!--K means-->
-      <hr/>
-      <div class="row">
-        <div class="col-6 d-flex justify-content-center">
-          <button type="button" class="btn btn-light" id="K">K</button>
-        </div>
-        <div class="col-6 command">
-          K-Means
-        </div>
+    <!--K means-->
+    <hr />
+    <div class="row">
+      <div class="col-6 d-flex justify-content-center">
+        <button type="button" class="btn btn-light" id="K">K</button>
       </div>
-      <div class="row">
-        <div class="col-4">
+      <div class="col-6 command">
+        K-Means
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-4">
         <label for="customRange2">Velocity</label>
-        </div>
-        <div class='col-4'>
+      </div>
+      <div class='col-4'>
         <input type="range" class="custom-range" min="0" max="2" id="vel_k_means">
       </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div id="model-class">
       </div>
-      <div class="row">
-        <div id="model-class">
-        </div>
+    </div>
+    <hr />
+    <div class="row">
+      <section class="demo">
+        <div class="col-4">
+          Xvalue: <input type="range" multiple value="0,100" id="x_range" /><br /> <br />
+          Yvalue: <input type="range" multiple value="0,100" id="y_range" /><br /> <br />
+          ZValue: <input type="range" multiple value="0,100" id="z_range" />
+      </section>
+    </div>
+    <hr />
+    <section class="demo">
+      <div class='col-4'>
+        Dir &theta; <input type="range" class="custom-range" min="0" max="180" step="1" id="alfa_light"><br/> <br/>
+        Dir &phi; <input type="range" class="custom-range" min="-90" max="90" step="1" id="beta_light">
+      </section>
       </div>
-      <div class="row">
-        <section class="demo">
-              Xvalue: <input type="range" multiple value="0,100" id="x_range" />
-           <br/> <br/>
-          Yvalue:<input type="range" multiple value="0,100" id="y_range" /> <br/> <br/>
-          ZValue:<input type="range" multiple value="0,100" id="z_range" />  <br/> <br/>
-          </section>
-      </div>
-      </div>
-      
+    </div>
+
   </div>
 
 
-  
-    
-<div id="canvas-container">
-      <div id="text">
-        <span class="elemtodisplay">X:</span><span id="x_coordinate"></span> <br/>
-        <span class="elemtodisplay">Y:</span><span id="y_coordinate"></span> <br/>
-          <span class="elemtodisplay">Y:</span><span id="z_coordinate"> </span><br/>
-            <span class="elemtodisplay">Y:</span><span id="class_selected"> </span><br/>
-      </div>
-      <canvas id='canvas'></canvas>
+
+  </div>
+
+
+
+
+  <div id="canvas-container">
+    <div id="text">
+      <span class="elemtodisplay">X:</span><span id="x_coordinate"></span> <br />
+      <span class="elemtodisplay">Y:</span><span id="y_coordinate"></span> <br />
+      <span class="elemtodisplay">Y:</span><span id="z_coordinate"> </span><br />
+      <span class="elemtodisplay">Y:</span><span id="class_selected"> </span><br />
+    </div>
+    <canvas id='canvas'></canvas>
   </div>
 
 
@@ -163,25 +182,26 @@
     <div class="sk-chase-dot"></div>
     <div class="sk-chase-dot"></div>
     <div class="sk-chase-dot"></div>
-</div>
+  </div>
 
 
-<script type="text/javascript" src="./lib/utils.js" ></script>
-<script type="text/javascript" src="./lib/webgl-obj-loader.min.js"></script>
-<script type="text/javascript" src="./lib/quaternion.min.js"></script>
-<script type="text/javascript" src="./lib/Stats.js"></script>
-<script type="text/javascript" src="./lib/pca.min.js"></script>
+  <script type="text/javascript" src="./lib/utils.js"></script>
+  <script type="text/javascript" src="./lib/webgl-obj-loader.min.js"></script>
+  <script type="text/javascript" src="./lib/quaternion.min.js"></script>
+  <script type="text/javascript" src="./lib/Stats.js"></script>
+  <script type="text/javascript" src="./lib/pca.min.js"></script>
 
 
-<script type="text/javascript" src="./js/global.js"></script>
-<script type="text/javascript" src="./js/distances.js"></script>
-<script type="text/javascript" src="./js/kMeans.js"></script>
-<script type="text/javascript" src="./js/callbacks.js" ></script>
-<script type="text/javascript" src="./js/main.js" ></script>
+  <script type="text/javascript" src="./js/global.js"></script>
+  <script type="text/javascript" src="./js/distances.js"></script>
+  <script type="text/javascript" src="./js/kMeans.js"></script>
+  <script type="text/javascript" src="./js/callbacks.js"></script>
+  <script type="text/javascript" src="./js/main.js"></script>
 
 
-<script type="text/javascript" src="./model/pyramidDefinition.js" ></script>
+  <script type="text/javascript" src="./model/pyramidDefinition.js"></script>
 
 
 </body>
+
 </html>

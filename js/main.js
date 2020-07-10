@@ -203,6 +203,7 @@ function animate(){
       
 
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
+      sliderChange();
       var directionalLightTrasformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
 
 
@@ -477,4 +478,9 @@ function rayCubeIntersection(){
 }
 
 
-  
+
+function sliderChange(){
+  var t = utils.degToRad(document.getElementById("alfa_light").value);
+	var p = utils.degToRad(document.getElementById("beta_light").value);
+	directionalLight = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
+}
