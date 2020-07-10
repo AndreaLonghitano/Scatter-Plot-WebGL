@@ -216,7 +216,7 @@ function animate(){
 
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
       
-      var color= i==object_selected ? cubeMaterialColor: cubeMaterialColor2;
+      var color= i==object_selected ? cubeMaterialColor: colorDiffuseClass[dataset[i].class];
       gl.uniform3fv(programs[0].materialDiffColorHandle, color);
       gl.uniform3fv(programs[0].lightColorHandle,  directionalLightColor);
       gl.uniform3fv(programs[0].lightDirectionHandle,  directionalLightTrasformed);
@@ -297,15 +297,22 @@ window.addEventListener('mouseup',onMouseUp,false);
 function createUiModelClass(){
   classes.forEach((i)=>{
     $('#model-class').append( `<div class="row d-flex justify-content-center">
-    <div class="col-3 offset-1 justify-content-center">
+    <div class="col-2 offset-1 justify-content-center">
       <label for="class">Class${i}</label>
       </div>
-    <div class="col-7 offset-1 justify-content-center">
+    <div class="col-6 offset-1 justify-content-center">
     <select class="mdb-select md-form modelselect" style="background-color: azure;" id="class${i}">
     </select>
+    </div>
+    <div class="col-2">
+    <input type="color" class="favcol" id="favcolor${i}"  value="#${(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0')}" onchange="updatePalette(event)";
+    ">
   </div>
-  </div>` );
+  </div>`);
+  });
 
+  $(".favcol").toArray().forEach((ele)=>{
+      colorDiffuseClass.push(normalizeColor([hexToRgb(ele.value).r,hexToRgb(ele.value).g,hexToRgb(ele.value).b]));
   });
   
   $('.modelselect').toArray().forEach(sel => {
@@ -324,6 +331,7 @@ function createUiModelClass(){
 
 
 }
+
 
 
 function showAxes(){
@@ -383,6 +391,7 @@ function sliderLightChange(){
 	directionalLight = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
 }
 
+<<<<<<< HEAD
 function sliderAmbientDirChange(){
   var t = -utils.degToRad(document.getElementById("alfa_ambient").value);
 	var p = -utils.degToRad(document.getElementById("beta_ambient").value);
@@ -399,3 +408,23 @@ function ambientTypeSelection(){
     document.getElementById("hemispheric-dir").style.display = "none";
   }
 }
+=======
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+function normalizeColor(color){
+  return [color[0]/255.0,color[1]/255.0,color[2]/255.0];
+}
+
+function updatePalette(event){
+  var newValue=event.target.value;
+  var id=parseInt(event.target.id[event.target.id.length-1]);
+  colorDiffuseClass[id]=normalizeColor([hexToRgb(newValue).r,hexToRgb(newValue).g,hexToRgb(newValue).b]);
+}
+>>>>>>> a449e0704a199acd3d3af34c09bc9fd325a327dc
