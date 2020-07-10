@@ -223,7 +223,7 @@ function animate(){
       gl.uniform3fv(programs[0].AmbientLightColHandle,  ambientLightColor);
       gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
       gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
-      gl.uniform3fv(programs[0].AmbientMatColHandle, cubeMaterialColor2);
+      gl.uniform3fv(programs[0].AmbientMatColHandle, color);
       gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
       gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
