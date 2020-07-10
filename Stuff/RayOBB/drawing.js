@@ -32,7 +32,8 @@ void main() {
 
 var gl;
 var perspectiveMatrix,viewMatrix,cubeWorldMatrix;
-var cx=0.0,cy=2.0,cz=10.0;
+var cx=3.0,cy=3.0,cz=2.5;
+const SCALE_FACTOR=0.5;
 function main() {
 
   var program = null;
@@ -58,9 +59,9 @@ function main() {
   var cubeRy = 0.0;
   var cubeRz = 0.0;
 
-  //cubeWorldMatrix[0] = utils.MakeWorld( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
-  cubeWorldMatrix[0] = utils.MakeWorld( 0.0, 0.0, -1.5, 45, 0 , 0.0, 1.0);
-  //cubeWorldMatrix[2] = utils.MakeWorld( 0.0, 0.0, -3.0, 0.0, 0.0, 0.0, 0.5);
+  cubeWorldMatrix[0] = utils.MakeWorld( -3.0, 0.0, -1.5, 0.0, 0.0, 0.0, SCALE_FACTOR);
+  cubeWorldMatrix[1] = utils.MakeWorld( 3.0, 0.0, -1.5, 0.0, 0.0, 0.0, SCALE_FACTOR);
+  cubeWorldMatrix[2] = utils.MakeWorld( 0.0, 0.0, -3.0, 0.0, 0.0, 0.0, SCALE_FACTOR);
 
   var canvas = document.getElementById("c");
   gl = canvas.getContext("webgl2");
@@ -88,7 +89,7 @@ function main() {
   var normalMatrixPositionHandle = gl.getUniformLocation(program, 'nMatrix');
   
   perspectiveMatrix = utils.MakePerspective(90, gl.canvas.width/gl.canvas.height, 0.1, 100.0);
-  viewMatrix = utils.MakeView(cx, cy, cz, -5, 20);
+  viewMatrix = utils.MakeView(cx, cy, cz, -45.0, -40.0);
     
   var vao = gl.createVertexArray();
 
@@ -117,7 +118,7 @@ function main() {
     gl.clearColor(0.85, 0.85, 0.85, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    for(i = 0; i < 1; i++){
+    for(i = 0; i < 3; i++){
       var viewWorldMatrix = utils.multiplyMatrices(viewMatrix, cubeWorldMatrix[i]);
       var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, viewWorldMatrix);
       gl.uniformMatrix4fv(matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
@@ -144,7 +145,6 @@ main();
 window.addEventListener('mouseup',onMouseUp,false);
 
 function onMouseUp(ev){
-  console.log("HHDAHAD");
 
   //This is a way of calculating the coordinates of the click in the canvas taking into account its possible displacement in the page
   var top = 0.0, left = 0.0;
@@ -160,7 +160,6 @@ function onMouseUp(ev){
    //Here we calculate the normalised device coordinates from the pixel coordinates of the canvas
    var normX = (2*x)/ gl.canvas.width - 1;
    var normY = 1 - (2*y) / gl.canvas.height;
-   console.log("NormX:"+normX+" NormY"+normY);
 
    if(Math.abs(normX)<=1 && Math.abs(normY)<=1){
 
@@ -176,14 +175,14 @@ function onMouseUp(ev){
         //We find the direction expressed in world coordinates by multipling with the inverse of the view matrix
   var rayDir = utils.multiplyMatrixVector(viewInv, rayEyeCoords);
   var normalisedRayDir = utils.normalizeVec3(rayDir);
-  console.log("NormalisedRayDir:"+normalisedRayDir);
   //The ray starts from the camera in world coordinates
   var rayStartPoint = [cx, cy, cz];
 
+  
 
-  for(i = 0; i < 1; i++){
-      var test=TestRayOBBINtersection(rayStartPoint,normalisedRayDir,[-1.0,-1.0,-1.0],[1.0,1.0,1.0],cubeWorldMatrix[i]);
-      console.log(test);
+  for(i = 0; i < 3; i++){
+      var test=TestRayOBBINtersection(rayStartPoint,normalisedRayDir,[-1.0, -1.0, -1.0].map(function(x) { return x * SCALE_FACTOR}) ,[1.0, 1.0, 1.0].map(function(x) { return x * SCALE_FACTOR}),cubeWorldMatrix[i]);
+      if(test!==-1)console.log("Hit cube:"+i);
 }
    }
   }
@@ -196,8 +195,8 @@ function TestRayOBBINtersection(rayStartPoint,ray_direction,aabb_min,aabb_max,Mo
   var delta=[traslation[0]-rayStartPoint[0],traslation[1]-rayStartPoint[1],traslation[2]-rayStartPoint[2]];
 
 {
-
-    var xaxis=[ModelMatrix[0], ModelMatrix[4], ModelMatrix[8]];
+    // important to normalize
+    var xaxis=utils.normalizeVec3([ModelMatrix[0], ModelMatrix[4], ModelMatrix[8]]);
     var e=  xaxis[0]*delta[0]+xaxis[1]*delta[1]+xaxis[2]*delta[2];
     var f = ray_direction[0]*xaxis[0]+ray_direction[1]*xaxis[1]+ray_direction[2]*xaxis[2];
 
@@ -226,15 +225,15 @@ function TestRayOBBINtersection(rayStartPoint,ray_direction,aabb_min,aabb_max,Mo
 			// If "far" is closer than "near", then there is NO intersection.
 			// See the images in the tutorials for the visual explanation.
 			if (tMax < tMin )
-				return false;
+				return -1;
 
 		}else{ // Rare case : the ray is almost parallel to the planes, so they don't have any "intersection"
 			if(-e+aabb_min[0] > 0.0 || -e+aabb_max[0] < 0.0)
-				return false;
+				return -1;
     }
   }
     {
-    var yaxis=[ModelMatrix[1], ModelMatrix[5], ModelMatrix[9]]; //nuovo asse y
+    var yaxis=utils.normalizeVec3([ModelMatrix[1], ModelMatrix[5], ModelMatrix[9]]); //nuovo asse y
     var e=  yaxis[0]*delta[0]+yaxis[1]*delta[1]+yaxis[2]*delta[2];
     var f = ray_direction[0]*yaxis[0]+ray_direction[1]*yaxis[1]+ray_direction[2]*yaxis[2];
 
@@ -263,16 +262,16 @@ function TestRayOBBINtersection(rayStartPoint,ray_direction,aabb_min,aabb_max,Mo
 			// If "far" is closer than "near", then there is NO intersection.
 			// See the images in the tutorials for the visual explanation.
 			if (tMax < tMin )
-				return false;
+				return -1;
 
 		}else{ // Rare case : the ray is almost parallel to the planes, so they don't have any "intersection"
 			if(-e+aabb_min[1] > 0.0 || -e+aabb_max[1] < 0.0)
-				return false;
+				return -1;
     }
   }
     
 {
-    var zaxis=[ModelMatrix[2], ModelMatrix[6], ModelMatrix[10]]; // nuovo asse z
+    var zaxis=utils.normalizeVec3([ModelMatrix[2], ModelMatrix[6], ModelMatrix[10]]); // nuovo asse z
     var e =  zaxis[0]*delta[0]+zaxis[1]*delta[1]+zaxis[2]*delta[2];
     var f = ray_direction[0]*zaxis[0]+ray_direction[1]*zaxis[1]+ray_direction[2]*zaxis[2];
 
@@ -301,16 +300,15 @@ function TestRayOBBINtersection(rayStartPoint,ray_direction,aabb_min,aabb_max,Mo
 			// If "far" is closer than "near", then there is NO intersection.
 			// See the images in the tutorials for the visual explanation.
 			if (tMax < tMin )
-				return false;
+				return -1;
 
 		}else{ // Rare case : the ray is almost parallel to the planes, so they don't have any "intersection"
 			if(-e+aabb_min[2] > 0.0 || -e+aabb_max[2] < 0.0)
-				return false;
+				return -1;
     }
   }
     
-    var intersection_distance=tMin;
-    return true;
+    return tMin;
 
 }
 
