@@ -80,7 +80,22 @@ var directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
             Math.cos(dirLightAlpha) * Math.sin(dirLightBeta)
             ];
 var directionalLightColor = [1.0, 1.0, 1.0];
-var ambientLightColor = [ 0.33, 0.33, 0.33]; // modify this for the "shadows"
+
+//Ambient Light
+var ambientLightColor = [0.33, 0.33, 0.33]; // modify this for the "shadows"
+var ambientLightLowColor = [0.0, 0.13, 0.0];
+var ambientTypeDict = {
+    0: [0,0,0,0], //none
+		1: [1,0,0,0], //ambient
+		2: [0,1,0,0] //hemispheric
+}
+var ambientType = ambientTypeDict[0];
+var dirAmbAlpha = -utils.degToRad(90);
+var dirAmbBeta  = -utils.degToRad(0);
+var ambientLightDir = [Math.cos(dirAmbAlpha) * Math.cos(dirAmbBeta),
+  Math.sin(dirAmbAlpha),
+  Math.cos(dirAmbAlpha) * Math.sin(dirAmbBeta)
+  ]; 
 
 //Oggetto selezionato
 var object_selected=-1; /* -1 => no object selected, >=0 object selected */

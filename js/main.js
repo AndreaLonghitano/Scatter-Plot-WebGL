@@ -80,6 +80,9 @@
   programs[0].lightColorHandle = gl.getUniformLocation(programs[0], 'L1_lightColor');
   programs[0].AmbientMatColHandle = gl.getUniformLocation(programs[0], "ambientMatColor");
   programs[0].AmbientLightColHandle = gl.getUniformLocation(programs[0], "ambientLightColor");
+  programs[0].AmbientLightLowColHandle = gl.getUniformLocation(programs[0], "ambientLightLowColor");
+  programs[0].AmbienttDirHandle = gl.getUniformLocation(programs[0], "ambientDir");
+  programs[0].AmbientTypeHandle = gl.getUniformLocation(programs[0], "ambientType");
   programs[0].MatEmisColHandle = gl.getUniformLocation(programs[0], "emitColor");
   programs[0].specShineHandle = gl.getUniformLocation(programs[0], "SpecShine");
   programs[0].specularColorHandle = gl.getUniformLocation(programs[0], "specularColor");
@@ -204,9 +207,11 @@ function animate(){
       
 
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
-      sliderChange(); //This update directionalLight based on the sliders
+      sliderLightChange(); //This update directionalLight based on the sliders
       var directionalLightTrasformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
 
+      sliderAmbientDirChange(); //Update direction hemispheric ambient
+      var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,ambientLightDir));
 
 
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
@@ -216,7 +221,10 @@ function animate(){
       gl.uniform3fv(programs[0].lightColorHandle,  directionalLightColor);
       gl.uniform3fv(programs[0].lightDirectionHandle,  directionalLightTrasformed);
       gl.uniform3fv(programs[0].AmbientLightColHandle,  ambientLightColor);
+      gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
+      gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
       gl.uniform3fv(programs[0].AmbientMatColHandle, cubeMaterialColor2);
+      gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
       gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
@@ -369,8 +377,25 @@ function showPyramid(negative_axes){
 
 
 
-function sliderChange(){
+function sliderLightChange(){
   var t = -utils.degToRad(document.getElementById("alfa_light").value);
 	var p = -utils.degToRad(document.getElementById("beta_light").value);
 	directionalLight = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
+}
+
+function sliderAmbientDirChange(){
+  var t = -utils.degToRad(document.getElementById("alfa_ambient").value);
+	var p = -utils.degToRad(document.getElementById("beta_ambient").value);
+	ambientLightDir = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
+}
+
+function ambientTypeSelection(){
+  var type = document.getElementById("ambient-type-select").value;
+  ambientType = ambientTypeDict[type]
+  if (type == 2) {
+    document.getElementById("hemispheric-dir").style.display = "block";
+  }
+  else {
+    document.getElementById("hemispheric-dir").style.display = "none";
+  }
 }
