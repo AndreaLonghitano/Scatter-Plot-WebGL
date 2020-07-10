@@ -391,7 +391,6 @@ function sliderLightChange(){
 	directionalLight = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
 }
 
-<<<<<<< HEAD
 function sliderAmbientDirChange(){
   var t = -utils.degToRad(document.getElementById("alfa_ambient").value);
 	var p = -utils.degToRad(document.getElementById("beta_ambient").value);
@@ -408,7 +407,6 @@ function ambientTypeSelection(){
     document.getElementById("hemispheric-dir").style.display = "none";
   }
 }
-=======
 function hexToRgb(hex) {
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
@@ -427,4 +425,3 @@ function updatePalette(event){
   var id=parseInt(event.target.id[event.target.id.length-1]);
   colorDiffuseClass[id]=normalizeColor([hexToRgb(newValue).r,hexToRgb(newValue).g,hexToRgb(newValue).b]);
 }
->>>>>>> a449e0704a199acd3d3af34c09bc9fd325a327dc
