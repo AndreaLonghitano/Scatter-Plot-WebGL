@@ -21,8 +21,13 @@ const MAX_MOVEMENT_Z=250.0;
 const MAX_MOVEMENT_Y=250.0;
 const RADIUS=2.0;
 const MULTIPLICATIVE_FACTOR=50.0;
-
 const SCALE_FACTOR=250;
+
+
+
+
+
+
 
 
 var dataset,classes; 
@@ -64,7 +69,7 @@ var vx=0,vy=0,vz=0;
 var elevation=-20.0,angle=0;
 var viewMatrix;
 var showNegativeAxes=1;
-
+var palettes=document.getElementsByClassName('favcolor');
 
 // da qui sono tutte da elimianre 
 var cubeNormalMatrix;
@@ -85,6 +90,7 @@ var ambientLightColor = [ 0.33, 0.33, 0.33]; // modify this for the "shadows"
 //Oggetto selezionato
 var object_selected=-1; /* -1 => no object selected, >=0 object selected */
 //Define material color
+var colorDiffuseClass=new Array();
 var cubeMaterialColor = [1.0, 0.0, 0.0]; 
 var cubeMaterialColor2 = [0.0, 1.0, 0.0];
 var materialEmissionColor = [0.0, 0.0, 0.0];
