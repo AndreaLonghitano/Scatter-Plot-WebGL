@@ -65,10 +65,6 @@ var elevation=-20.0,angle=0;
 var viewMatrix;
 var showNegativeAxes=1;
 
-var lookRadius = 50.0;
-var mouseState = false;
-var lastMouseX = -100, lastMouseY = -100;
-
 
 // da qui sono tutte da elimianre 
 var cubeNormalMatrix;
@@ -86,9 +82,11 @@ var directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
 var directionalLightColor = [1.0, 1.0, 1.0];
 var ambientLightColor = [ 0.33, 0.33, 0.33]; // modify this for the "shadows"
 
+//Oggetto selezionato
+var object_selected=-1; /* -1 => no object selected, >=0 object selected */
 //Define material color
-var cubeMaterialColor = [0.5, 0.5, 0.5]; 
-var cubeMaterialColor2 = [1.0, 0.0, 0.0];
+var cubeMaterialColor = [1.0, 0.0, 0.0]; 
+var cubeMaterialColor2 = [0.0, 1.0, 0.0];
 var materialEmissionColor = [0.0, 0.0, 0.0];
 var colorAxes=[0.5, 0.5, 0.5];
 

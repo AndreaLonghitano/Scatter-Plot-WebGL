@@ -211,8 +211,8 @@ function animate(){
 
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
       
-
-      gl.uniform3fv(programs[0].materialDiffColorHandle, cubeMaterialColor2);
+      var color= i==object_selected ? cubeMaterialColor: cubeMaterialColor2;
+      gl.uniform3fv(programs[0].materialDiffColorHandle, color);
       gl.uniform3fv(programs[0].lightColorHandle,  directionalLightColor);
       gl.uniform3fv(programs[0].lightDirectionHandle,  directionalLightTrasformed);
       gl.uniform3fv(programs[0].AmbientLightColHandle,  ambientLightColor);

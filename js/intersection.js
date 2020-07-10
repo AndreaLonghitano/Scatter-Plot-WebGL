@@ -59,8 +59,10 @@ function onMouseUp(ev){
         }
         }
     
-        if(min_index==+Infinity && $('#text').css('z-index')==1)
+        if(min_index==+Infinity && $('#text').css('z-index')==1){
             $('#text').css('z-index',-1);
+            object_selected=-1;
+        }
             // delete the color of this object eventually
         else if (min_index!==+Infinity){
         console.log("The element "+i+"was selected and it's a "+ dataset[min_index].class);
@@ -69,7 +71,7 @@ function onMouseUp(ev){
         $('#y_coordinate').text(dataset[min_index].y);
         $('#z_coordinate').text(dataset[min_index].z);
         $('#class_selected').text(dataset[min_index].class);
-        
+        object_selected=min_index;
         }
   
   }
