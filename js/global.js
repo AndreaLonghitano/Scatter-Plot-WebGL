@@ -76,21 +76,23 @@ var cubeNormalMatrix;
 var cubeWorldMatrix = new Array();    //One world matric for each cube...
 
 //define directional light
-var dirLightAlpha = utils.degToRad(90);
-var dirLightBeta  = utils.degToRad(0);
+var dirLightAlpha = -utils.degToRad(90);
+var dirLightBeta  = -utils.degToRad(0);
 
 var directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
             Math.sin(dirLightAlpha),
             Math.cos(dirLightAlpha) * Math.sin(dirLightBeta)
             ];
-var directionalLightColor = [0.1, 1.0, 1.0];
+var directionalLightColor = [1.0, 1.0, 1.0];
+var ambientLightColor = [ 0.33, 0.33, 0.33]; // modify this for the "shadows"
 
 //Define material color
-var cubeMaterialColor = [0.5, 0.5, 0.5];
-var cubeMaterialColor2 = [1.0, 1.0, 0.0];
+var cubeMaterialColor = [0.5, 0.5, 0.5]; 
+var cubeMaterialColor2 = [1.0, 0.0, 0.0];
+var materialEmissionColor = [0.0, 0.0, 0.0];
 var colorAxes=[0.5, 0.5, 0.5];
 
-var SpecShine = 1;
+var SpecShine = 50;
 var specularColor = [1.0,  1.0,  1.0];
 
 var lastUpdateTime = (new Date).getTime();

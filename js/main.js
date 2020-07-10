@@ -80,6 +80,7 @@
   programs[0].lightColorHandle = gl.getUniformLocation(programs[0], 'L1_lightColor');
   programs[0].AmbientMatColHandle = gl.getUniformLocation(programs[0], "ambientMatColor");
   programs[0].AmbientLightColHandle = gl.getUniformLocation(programs[0], "ambientLightColor");
+  programs[0].MatEmisColHandle = gl.getUniformLocation(programs[0], "emitColor");
   programs[0].specShineHandle = gl.getUniformLocation(programs[0], "SpecShine");
   programs[0].specularColorHandle = gl.getUniformLocation(programs[0], "specularColor");
   programs[0].lightDirMatrixPositionHandle = gl.getUniformLocation(programs[0], 'lightDirMatrix');
@@ -187,7 +188,7 @@ function animate(){
           dataset[i].z < (min_z+(z_range.valueLow*(max_z-min_z)/100)) || dataset[i].z > (z_range.valueHigh*(max_z-min_z)/100)){
           continue;
       }
-
+      
 
       
 
@@ -203,7 +204,7 @@ function animate(){
       
 
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
-      sliderChange();
+      sliderChange(); //This update directionalLight based on the sliders
       var directionalLightTrasformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
 
 
@@ -211,11 +212,12 @@ function animate(){
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
       
 
-      gl.uniform3fv(programs[0].materialDiffColorHandle, cubeMaterialColor);
+      gl.uniform3fv(programs[0].materialDiffColorHandle, cubeMaterialColor2);
       gl.uniform3fv(programs[0].lightColorHandle,  directionalLightColor);
       gl.uniform3fv(programs[0].lightDirectionHandle,  directionalLightTrasformed);
-      gl.uniform3fv(programs[0].AmbientLightColHandle,  directionalLightColor);
-      gl.uniform3fv(programs[0].AmbientMatColHandle, cubeMaterialColor);
+      gl.uniform3fv(programs[0].AmbientLightColHandle,  ambientLightColor);
+      gl.uniform3fv(programs[0].AmbientMatColHandle, cubeMaterialColor2);
+      gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform3fv(programs[0].eyePosUniform, eyePosTransformed);
@@ -480,7 +482,7 @@ function rayCubeIntersection(){
 
 
 function sliderChange(){
-  var t = utils.degToRad(document.getElementById("alfa_light").value);
-	var p = utils.degToRad(document.getElementById("beta_light").value);
+  var t = -utils.degToRad(document.getElementById("alfa_light").value);
+	var p = -utils.degToRad(document.getElementById("beta_light").value);
 	directionalLight = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
 }
