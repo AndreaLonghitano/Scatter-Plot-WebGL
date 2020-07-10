@@ -286,11 +286,11 @@ window.addEventListener('mouseup',onMouseUp,false);
 
 function createUiModelClass(){
   classes.forEach((i)=>{
-    $('#model-class').append( `<div class="row">
-    <div class="col-4">
-      <label for="class">Class ${i}</label>
+    $('#model-class').append( `<div class="row d-flex justify-content-center">
+    <div class="col-3 offset-1 justify-content-center">
+      <label for="class">Class${i}</label>
       </div>
-    <div class="col-8 justify-content-center">
+    <div class="col-7 offset-1 justify-content-center">
     <select class="mdb-select md-form modelselect" style="background-color: azure;" id="class${i}">
     </select>
   </div>
@@ -389,8 +389,6 @@ function onMouseUp(ev){
   var viewInv = utils.invertMatrix(viewMatrix);
 
   var pointEyeCoords = utils.multiplyMatrixVector(projInv, [normX, normY, -1, 1]); // 1 per la w , -1 perche devi cambiare la z
-  console.log("Point eye coords "+pointEyeCoords);
-
   var rayEyeCoords = [pointEyeCoords[0], pointEyeCoords[1], pointEyeCoords[2], 0];
 
         
