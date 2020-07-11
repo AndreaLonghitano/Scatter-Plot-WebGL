@@ -68,7 +68,8 @@
   dataset.forEach((element)=> dataset_pca.push([element.x,element.y,element.z]));
   dataset.forEach((element)=> dataset_kMeans.push([element.x,element.y,element.z]));
   var eigenvectors = PCA.getEigenVectors(dataset_pca);
-  
+  adjusted_data_x=PCA.computeAdjustedData(dataset_pca,eigenvectors[0],eigenvectors[1]).adjustedData[0];
+  adjusted_data_y=PCA.computeAdjustedData(dataset_pca,eigenvectors[0],eigenvectors[1]).adjustedData[1];
   var k_means=new KMeans(dataset_kMeans,centroids,rate_k_means,distance="manhattan");
   values=k_means.performSteps();
 
@@ -171,12 +172,26 @@ class Item {
   }
 }
 
-
-
 function animate(){
-
-         
+  if (!time){
+    initializeControlPoint();
+    console.log("HDAHHAD");
   }
+  var quadratic;
+  var point;
+  for (var i=0;i<items.length;i++){
+
+    point=bezier.quadraticBezier([items[i].x,items[i].y,items[i].z],control_quadratic_points[i],[adjusted_data_x[i],adjusted_data_y[i],0.0],time/maxT);
+    
+    items[i].set_pos(utils.MakeWorld(point.x*MULTIPLICATIVE_FACTOR,point.y*MULTIPLICATIVE_FACTOR,point.z*MULTIPLICATIVE_FACTOR,items[i].rotX,items[i].rotY,items[i].rotZ,RADIUS));
+  }
+  time+=VELOCITY_PCA;
+  console.log(time);
+  if(time>=maxT){
+    time=0;
+    pca=!pca;
+  }         
+}
 
   var updateScene = function () {
     stats.begin();
@@ -201,11 +216,13 @@ function animate(){
   }
 
   function drawScene() {
+    if(pca){
+      animate();
+    }
     resize(gl.canvas);
     gl.clearColor(0.85, 0.85, 0.85, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    animate();
     computeViewMatrix();
     showAxes();
     gl.useProgram(programs[0]);
@@ -450,4 +467,32 @@ function updatePalette(event){
   var newValue=event.target.value;
   var id=parseInt(event.target.id[event.target.id.length-1]);
   colorDiffuseClass[id]=normalizeColor([hexToRgb(newValue).r,hexToRgb(newValue).g,hexToRgb(newValue).b]);
+}
+
+
+var bezier={
+  quadraticBezier:(p0,p1,p2,t)=>{
+    var pFinal={};
+    pFinal.x= Math.pow(1-t,2) * p0[0] + (1-t)*2*t*p1[0] + Math.pow(t,2)*p2[0];
+    pFinal.y= Math.pow(1-t,2) * p0[1] + (1-t)*2*t*p1[1] + Math.pow(t,2)*p2[1];
+    pFinal.z= Math.pow(1-t,2) * p0[2] + (1-t)*2*t*p1[2] + Math.pow(t,2)*p2[2];
+    return pFinal;
+
+  },
+  cubicBezier:(p0,p1,p2,p3,t)=>{
+    var pFinal={};
+    pFinal.x= Math.pow(1-t,3) *pO[0] + (1-t)*3*t*p1[0] + (1-t)*3*t*t*p2[0] + Math.pow(t,3)*p3[0];
+    pFinal.y= Math.pow(1-t,3) *pO[1] + (1-t)*3*t*p1[1] + (1-t)*3*t*t*p2[1] + Math.pow(t,3)*p3[1];
+    pFinal.z= Math.pow(1-t,3) *pO[2] + (1-t)*3*t*p1[2] + (1-t)*3*t*t*p2[2] + Math.pow(t,3)*p3[2];
+    return pFinal;
+  }
+}
+
+
+function initializeControlPoint(){
+  dataset.forEach((element,index)=>{
+    var sign=Math.floor(Math.random()*2) == 1 ? 1 : -1;
+    control_quadratic_points[index]=[(element.x+adjusted_data_x[index])/2 + sign*Math.random(),(element.y+adjusted_data_y[index])/2 + sign*Math.random(),(element.z + 0) +sign*Math.random()];
+  })
+
 }

@@ -22,6 +22,7 @@ const MAX_MOVEMENT_Y=250.0;
 const RADIUS=2.0;
 const MULTIPLICATIVE_FACTOR=50.0;
 const SCALE_FACTOR=250;
+const VELOCITY_PCA=0.01;
 
 
 
@@ -41,6 +42,14 @@ var cube;
 var pyramid;
 var listOfPossibleModels;
 var models;
+//pca
+var pca=false;
+var adjusted_data_x;
+var adjusted_data_y;
+var maxT=3.0;
+var time=0.0;
+var control_quadratic_points=[];
+
 
 
 var keys=[];
