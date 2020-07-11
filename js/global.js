@@ -118,7 +118,18 @@ var object_selected=-1; /* -1 => no object selected, >=0 object selected */
 var colorDiffuseClass=new Array();
 var cubeMaterialColor = [1.0, 0.0, 0.0]; 
 var cubeMaterialColor2 = [0.0, 1.0, 0.0];
+
+var diffuseTypeDict= {
+  0: [1,0,0,0],
+  1: [0,1,0,0]
+}
+var diffuseType = diffuseTypeDict[0];
+
+//Emission
 var materialEmissionColor = [0.0, 0.0, 0.0];
+
+
+
 var colorAxes=[0.5, 0.5, 0.5];
 
 var SpecShine = 50;
