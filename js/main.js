@@ -79,9 +79,13 @@
   programs[0].normalAttributeLocation = gl.getAttribLocation(programs[0], "inNormal");  
   programs[0].matrixLocation = gl.getUniformLocation(programs[0], "matrix");
   programs[0].materialDiffColorHandle = gl.getUniformLocation(programs[0], 'mDiffColor');
-  programs[0].diffseTypeHandle = gl.getUniformLocation(programs[0], "diffuseType");
+  programs[0].diffuseTypeHandle = gl.getUniformLocation(programs[0], "diffuseType");
   programs[0].lightDirectionHandle = gl.getUniformLocation(programs[0], 'L1_lightDirection');
   programs[0].lightColorHandle = gl.getUniformLocation(programs[0], 'L1_lightColor');
+  programs[0].lightPosHandle = gl.getUniformLocation(programs[0], "L1_Pos");
+  programs[0].lightDecayHandle = gl.getUniformLocation(programs[0], "L1_Decay");
+  programs[0].lightTargetHandle = gl.getUniformLocation(programs[0], "L1_Target");
+  programs[0].lightTypeHandle = gl.getUniformLocation(programs[0], "lightType");
   programs[0].AmbientMatColHandle = gl.getUniformLocation(programs[0], "ambientMatColor");
   programs[0].AmbientLightColHandle = gl.getUniformLocation(programs[0], "ambientLightColor");
   programs[0].AmbientLightLowColHandle = gl.getUniformLocation(programs[0], "ambientLightLowColor");
@@ -249,6 +253,8 @@ function animate(){
 
       var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix),[cx,cy,cz,1.0]);
       
+      sliderPosLight(); //Update Light postions
+      var lightPosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix),[dirLightPos_x,dirLightPos_y,dirLightPos_z,1.0]);
 
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
       sliderLightChange(); //This update directionalLight based on the sliders
@@ -261,10 +267,14 @@ function animate(){
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
       
       var color= i==object_selected ? cubeMaterialColor: colorDiffuseClass[dataset[i].class];
-      gl.uniform4fv(programs[0].diffseTypeHandle, diffuseType);
+      gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
       gl.uniform3fv(programs[0].materialDiffColorHandle, color);
       gl.uniform3fv(programs[0].lightColorHandle,  directionalLightColor);
       gl.uniform3fv(programs[0].lightDirectionHandle,  directionalLightTrasformed);
+      gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
+      gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
+      gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
+      gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
       gl.uniform3fv(programs[0].AmbientLightColHandle,  ambientLightColor);
       gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
       gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
@@ -273,7 +283,7 @@ function animate(){
       gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
-      gl.uniform3fv(programs[0].eyePosUniform, eyePosTransformed);
+      gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
 
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0 );
@@ -442,6 +452,12 @@ function sliderAmbientDirChange(){
 	ambientLightDir = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
 }
 
+function sliderPosLight(){
+  dirLightPos_x = document.getElementById("x_light").value;
+  dirLightPos_y = document.getElementById("y_light").value;
+  dirLightPos_z = document.getElementById("z_light").value;
+}
+
 function ambientTypeSelection(){
   var type = document.getElementById("ambient-type-select").value;
   ambientType = ambientTypeDict[type];
@@ -456,6 +472,18 @@ function diffuseTypeSelection(){
   var type = document.getElementById("diffuse-type-select").value;
   diffuseType = diffuseTypeDict[type];
  
+}
+function lightTypeSelection(){
+  var type = document.getElementById("light-type-select").value;
+  dirLightType = dirLightTypeDict[type];
+  if (type == 0) {
+    document.getElementById("direct").style.display = "block";
+    document.getElementById("point").style.display = "none";
+  }
+  else if (type == 1){
+    document.getElementById("point").style.display = "block";
+    document.getElementById("direct").style.display = "none";
+  }
 }
 
 function hexToRgb(hex) {

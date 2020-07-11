@@ -141,12 +141,25 @@
         <div class="row d-flex justify-content-center">
           <div class="col-3 offset-1 justify-content-center">
             <label for="class">Light</label>
-          </section>
-    <div>
-      &theta; <input type="range" class="custom-range" min="0" max="180" step="1" id="alfa_light"><br /> <br />
-      &phi; <input type="range" class="custom-range" min="-90" max="90" step="1" id="beta_light">
-    </div>
-    <hr />
+          </div>
+          <div class="col-7 offset-1 justify-content-center">
+            <select class="mdb-select md-form" style="background-color: azure;" id="light-type-select"
+              onchange="lightTypeSelection()">
+              <option value="0">Direct</option>
+              <option value="1">Point</option>
+              <option value="2">Spot</option>
+            </select>
+          </div>
+        </div>
+        <div id="direct" style="display:block;">
+          &theta; <input type="range" class="custom-range" min="0" max="180" step="1" id="alfa_light"><br /> <br />
+          &phi; <input type="range" class="custom-range" min="-90" max="90" step="1" id="beta_light"></div>
+        <div id="point" style="display:none;">
+          pos x <input type="range" class="custom-range" min="-250" max="250" step="1" id="x_light"><br /> <br />
+          pos y <input type="range" class="custom-range" min="-250" max="250" step="1" id="y_light"><br /> <br />
+          pos z <input type="range" class="custom-range" min="-250" max="250" step="1" id="z_light"></div>
+
+    </section>
 
     <section class="demo">
       <div class='col-4'>

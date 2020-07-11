@@ -96,6 +96,21 @@ var directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
             ];
 var directionalLightColor = [1.0, 1.0, 1.0];
 
+var dirLightPos_x = 0.0;
+var dirLightPos_y = 0.0;
+var dirLightPos_z = 0.0;
+var lightConeOut = 30;
+var lightConeIn = 80;
+var lightDecay = 0;
+var lightTarget = 61;
+
+var dirLightTypeDict = {
+  0: [1,0,0,0], //direct
+  1: [0,1,0,0], //point
+  2: [0,0,1,0] //spot
+}
+var dirLightType = dirLightTypeDict[0];
+
 //Ambient Light
 var ambientLightColor = [0.33, 0.33, 0.33]; // modify this for the "shadows"
 var ambientLightLowColor = [0.0, 0.13, 0.0];
@@ -120,8 +135,8 @@ var cubeMaterialColor = [1.0, 0.0, 0.0];
 var cubeMaterialColor2 = [0.0, 1.0, 0.0];
 
 var diffuseTypeDict= {
-  0: [1,0,0,0],
-  1: [0,1,0,0]
+  0: [1,0,0,0], //lambert
+  1: [0,1,0,0] //Oren-Nayer
 }
 var diffuseType = diffuseTypeDict[0];
 
