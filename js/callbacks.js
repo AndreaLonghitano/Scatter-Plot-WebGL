@@ -2,7 +2,7 @@ var callbacks={
 
     onkeyUp: (event) =>{
         var element=document.getElementById(event.key.toUpperCase());
-        if (element){
+        if (element && element.id!=='P'){
           element.style.backgroundColor=color_button;
         }
 
@@ -92,8 +92,8 @@ var callbacks={
 
         var element=document.getElementById(event.key.toUpperCase());
             if (element) {
-        element.style.backgroundColor="#FF7948";
-        }
+              element.style.backgroundColor="#FF7948";
+            }
 
 
         if(!keys[event.keyCode]) {

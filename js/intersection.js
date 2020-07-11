@@ -46,7 +46,7 @@ function onMouseUp(ev){
     
     
         if (ele=="Sphere"){
-            distance_hit = raySphereIntersection(rayStartPoint, normalisedRayDir, dataset[i], RADIUS); //in the sphere there is no need to pass the model matrix
+            distance_hit = raySphereIntersection(rayStartPoint, normalisedRayDir, items[i], RADIUS); //in the sphere there is no need to pass the model matrix
         }
         else{ // cubo 
             distance_hit=RayOBBIntersection(rayStartPoint,normalisedRayDir,[-1.0, -1.0, -1.0].map(function(x) { return x * RADIUS}) ,[1.0, 1.0, 1.0].map(function(x) { return x * RADIUS}),items[i].worldM,RADIUS);
@@ -67,10 +67,10 @@ function onMouseUp(ev){
         else if (min_index!==+Infinity){
         console.log("The element "+i+"was selected and it's a "+ dataset[min_index].class);
         $('#text').css('z-index',1);
-        $('#x_coordinate').text(dataset[min_index].x);
-        $('#y_coordinate').text(dataset[min_index].y);
-        $('#z_coordinate').text(dataset[min_index].z);
-        $('#class_selected').text(dataset[min_index].class);
+        $('#x_coordinate').text(items[min_index].get_x());
+        $('#y_coordinate').text(items[min_index].get_y());
+        $('#z_coordinate').text(items[min_index].get_z());
+        $('#class_selected').text(items[min_index].class);
         object_selected=min_index;
         }
   

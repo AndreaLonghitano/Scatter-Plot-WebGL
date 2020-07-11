@@ -171,6 +171,27 @@ class Item {
   set_pos(worldMatrix){
     this.worldM=worldMatrix;
   }
+  set_x(x){
+    this.x=x;
+  }
+  set_y(y){
+    this.y=y;
+  }
+  set_z(z){
+    this.z=z;
+  }
+  
+  get_x(){
+    return this.x;
+  }
+
+  get_y(){
+    return this.y;
+  }
+
+  get_z(){
+    return this.z;
+  }
 
   pos(){
     return [this.worldM[3],this.worldM[7],this.worldM[11]];
@@ -180,21 +201,24 @@ class Item {
 function animate(){
   if (!time){
     initializeControlPoint();
-    console.log("HDAHHAD");
   }
   var quadratic;
   var point;
   for (var i=0;i<items.length;i++){
-
-    point=bezier.quadraticBezier([items[i].x,items[i].y,items[i].z],control_quadratic_points[i],[adjusted_data_x[i],adjusted_data_y[i],0.0],time/maxT);
-    
+    point=bezier.quadraticBezier([dataset[i].x,dataset[i].y,dataset[i].z],control_quadratic_points[i],[adjusted_data_x[i],adjusted_data_y[i],0.0],time/maxT);
     items[i].set_pos(utils.MakeWorld(point.x*MULTIPLICATIVE_FACTOR,point.y*MULTIPLICATIVE_FACTOR,point.z*MULTIPLICATIVE_FACTOR,items[i].rotX,items[i].rotY,items[i].rotZ,RADIUS));
+    items[i].set_x(point.x);
+    items[i].set_y(point.y);
+    items[i].set_z(point.z);
   }
   time+=VELOCITY_PCA;
-  console.log(time);
   if(time>=maxT){
     time=0;
     pca=!pca;
+    element=document.getElementById('P');
+    if (element){
+        element.style.backgroundColor=color_button;
+    }
   }         
 }
 
