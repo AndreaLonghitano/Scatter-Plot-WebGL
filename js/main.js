@@ -165,7 +165,18 @@ class Item {
       this.rotX=Math.floor(Math.random() * (360 - 0 + 1) + 0);
       this.rotY=Math.floor(Math.random() * (360 - 0 + 1) + 0);
       this.rotZ=Math.floor(Math.random() * (360 - 0 + 1) + 0);
+      this.initialQuaternion=Quaternion.fromEuler(utils.degToRad(this.rotZ),utils.degToRad(this.rotX),utils.degToRad(this.rotY)); // default order is ZYX
       this.worldM = utils.MakeWorld(this.x*MULTIPLICATIVE_FACTOR,this.y*MULTIPLICATIVE_FACTOR,this.z*MULTIPLICATIVE_FACTOR,this.rotX,this.rotY,this.rotZ,RADIUS);
+  }
+
+  set_rotX(x){
+    this.rotX=x;
+  }
+  set_rotY(y){
+    this.rotY=y;
+  }
+  set_rotZ(z){
+    this.rotZ=z;
   }
 
   set_pos(worldMatrix){
@@ -192,6 +203,9 @@ class Item {
   get_z(){
     return this.z;
   }
+  get_quaternion(){
+    return this.initialQuaternion;
+  }
 
   pos(){
     return [this.worldM[3],this.worldM[7],this.worldM[11]];
@@ -206,10 +220,16 @@ function animate(){
   var point;
   for (var i=0;i<items.length;i++){
     point=bezier.quadraticBezier([dataset[i].x,dataset[i].y,dataset[i].z],control_quadratic_points[i],[adjusted_data_x[i],adjusted_data_y[i],0.0],time/maxT);
-    items[i].set_pos(utils.MakeWorld(point.x*MULTIPLICATIVE_FACTOR,point.y*MULTIPLICATIVE_FACTOR,point.z*MULTIPLICATIVE_FACTOR,items[i].rotX,items[i].rotY,items[i].rotZ,RADIUS));
+    rotation=QuaternionToEuler(items[i].get_quaternion().slerp(Quaternion.fromEuler(utils.degToRad(45),0,0,order="XYZ"))(time/maxT));
+    items[i].set_pos(utils.MakeWorld(point.x*MULTIPLICATIVE_FACTOR,point.y*MULTIPLICATIVE_FACTOR,point.z*MULTIPLICATIVE_FACTOR,utils.radToDeg(rotation[0]),utils.radToDeg(rotation[1]),utils.radToDeg(rotation[2]),RADIUS));
     items[i].set_x(point.x);
     items[i].set_y(point.y);
     items[i].set_z(point.z);
+    items[i].set_rotX(utils.radToDeg(rotation[0]));
+    items[i].set_rotY(utils.radToDeg(rotation[1]));
+    items[i].set_rotZ(utils.radToDeg(rotation[2]));
+
+
   }
   time+=VELOCITY_PCA;
   if(time>=maxT){
