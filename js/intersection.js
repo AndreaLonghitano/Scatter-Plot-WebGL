@@ -46,10 +46,10 @@ function onMouseUp(ev){
     
     
         if (ele=="Sphere"){
-            distance_hit = raySphereIntersection(rayStartPoint, normalisedRayDir, dataset[i], RADIUS);
+            distance_hit = raySphereIntersection(rayStartPoint, normalisedRayDir, dataset[i], RADIUS); //in the sphere there is no need to pass the model matrix
         }
         else{ // cubo 
-            distance_hit=RayOBBIntersection(rayStartPoint,normalisedRayDir,[-1.0, -1.0, -1.0].map(function(x) { return x * RADIUS}) ,[1.0, 1.0, 1.0].map(function(x) { return x * RADIUS}),utils.MakeWorld(dataset[i].x*MULTIPLICATIVE_FACTOR,dataset[i].y*MULTIPLICATIVE_FACTOR,dataset[i].z*MULTIPLICATIVE_FACTOR,0,0,0,RADIUS));
+            distance_hit=RayOBBIntersection(rayStartPoint,normalisedRayDir,[-1.0, -1.0, -1.0].map(function(x) { return x * RADIUS}) ,[1.0, 1.0, 1.0].map(function(x) { return x * RADIUS}),items[i].worldM,RADIUS);
 
         }
     

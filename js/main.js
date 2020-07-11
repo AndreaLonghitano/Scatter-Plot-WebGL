@@ -36,6 +36,7 @@
         classes=[...new Set(dataset.map(item => item.class))];
   });
 
+  items=new Array(dataset.length);
   dataset.forEach((element,index)=> {
     min_x=Math.min(dataset[index].x,min_x)
     max_x=Math.max(dataset[index].x,max_x);
@@ -43,6 +44,7 @@
     max_z=Math.max(dataset[index].z,max_z);
     min_y=Math.min(dataset[index].y,min_y)
     max_y=Math.max(dataset[index].y,max_y);
+    items[index]=new Item([dataset[index].x,dataset[index].y,dataset[index].z],dataset[index].class);
 });
     // centroids for k-means
     await utils.get_json(baseDir+"/model/centroids.json", function(jsonFile){
@@ -147,6 +149,30 @@ function createVaoObjects(program,nameObject,vertices,normals=undefined,indices=
 
 
 
+// OBJECTS CLASSES
+class Item {
+  constructor([x,y,z],clas){
+      this.class=clas;
+      this.x=x;
+      this.y=y;
+      this.z=z;
+      this.rotX=Math.floor(Math.random() * (360 - 0 + 1) + 0);
+      this.rotY=Math.floor(Math.random() * (360 - 0 + 1) + 0);
+      this.rotZ=Math.floor(Math.random() * (360 - 0 + 1) + 0);
+      this.worldM = utils.MakeWorld(this.x*MULTIPLICATIVE_FACTOR,this.y*MULTIPLICATIVE_FACTOR,this.z*MULTIPLICATIVE_FACTOR,this.rotX,this.rotY,this.rotZ,RADIUS);
+  }
+
+  set_pos(worldMatrix){
+    this.worldM=worldMatrix;
+  }
+
+  pos(){
+    return [this.worldM[3],this.worldM[7],this.worldM[11]];
+  }
+}
+
+
+
 function animate(){
 
          
@@ -198,7 +224,7 @@ function animate(){
       var objSelected=$('#class'+dataset[i].class).val();
       var ele=listOfPossibleModels[objSelected];
 
-      var worldMatrix=utils.MakeWorld(dataset[i].x*MULTIPLICATIVE_FACTOR,dataset[i].y*MULTIPLICATIVE_FACTOR,dataset[i].z*MULTIPLICATIVE_FACTOR,0,0,0,RADIUS);
+      var worldMatrix=items[i].worldM;
 
       var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
       var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);

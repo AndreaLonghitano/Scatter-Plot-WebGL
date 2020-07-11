@@ -30,6 +30,7 @@ const SCALE_FACTOR=250;
 
 
 
+var items;
 var dataset,classes; 
 var dataset_pca=new Array();
 var dataset_kMeans=new Array();
@@ -63,10 +64,10 @@ var canvas=document.getElementById('canvas');
 
 
 // camera
-var cx =0.0,cy=0.0,cz=200.0;
+var cx =0.0,cy=0.0,cz=-200.0;
 var rvx = 0.0,rvy=0,rvz=0;
 var vx=0,vy=0,vz=0;
-var elevation=-20.0,angle=0;
+var elevation=-20.0,angle=-180.00;
 var viewMatrix;
 var showNegativeAxes=1;
 var palettes=document.getElementsByClassName('favcolor');
