@@ -169,7 +169,7 @@ var callbacks={
   
                 // PCA
                 case KEY_CODE.P:
-  
+                  pca=!pca;
                 break;
 
         }
@@ -203,9 +203,5 @@ $("#vel_k_means").on("input change", function() {
 $("#showNegativeAxes").click(()=>{
   showNegativeAxes= showNegativeAxes ? 0 : 1;
 });
-
-
-
-    
 
 
