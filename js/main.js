@@ -78,6 +78,7 @@
   programs[0].normalAttributeLocation = gl.getAttribLocation(programs[0], "inNormal");  
   programs[0].matrixLocation = gl.getUniformLocation(programs[0], "matrix");
   programs[0].materialDiffColorHandle = gl.getUniformLocation(programs[0], 'mDiffColor');
+  programs[0].diffseTypeHandle = gl.getUniformLocation(programs[0], "diffuseType");
   programs[0].lightDirectionHandle = gl.getUniformLocation(programs[0], 'L1_lightDirection');
   programs[0].lightColorHandle = gl.getUniformLocation(programs[0], 'L1_lightColor');
   programs[0].AmbientMatColHandle = gl.getUniformLocation(programs[0], "ambientMatColor");
@@ -243,6 +244,7 @@ function animate(){
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
       
       var color= i==object_selected ? cubeMaterialColor: colorDiffuseClass[dataset[i].class];
+      gl.uniform4fv(programs[0].diffseTypeHandle, diffuseType);
       gl.uniform3fv(programs[0].materialDiffColorHandle, color);
       gl.uniform3fv(programs[0].lightColorHandle,  directionalLightColor);
       gl.uniform3fv(programs[0].lightDirectionHandle,  directionalLightTrasformed);
@@ -425,7 +427,7 @@ function sliderAmbientDirChange(){
 
 function ambientTypeSelection(){
   var type = document.getElementById("ambient-type-select").value;
-  ambientType = ambientTypeDict[type]
+  ambientType = ambientTypeDict[type];
   if (type == 2) {
     document.getElementById("hemispheric-dir").style.display = "block";
   }
@@ -433,6 +435,12 @@ function ambientTypeSelection(){
     document.getElementById("hemispheric-dir").style.display = "none";
   }
 }
+function diffuseTypeSelection(){
+  var type = document.getElementById("diffuse-type-select").value;
+  diffuseType = diffuseTypeDict[type];
+ 
+}
+
 function hexToRgb(hex) {
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
