@@ -12,11 +12,12 @@ uniform mat4 lightDirMatrix;
 
 uniform vec4 ambientType;
 uniform vec4 diffuseType;
+uniform vec4 specularType;
 uniform vec4 lightType;
 
 //specular
 uniform float SpecShine;
-uniform vec3 specularColor;
+uniform vec3 specCol;
 
 //ambient
 uniform vec3 ambientMatColor;
@@ -112,6 +113,18 @@ vec3 computeDiffuseLight(vec3 normalVector, vec3 lightDir, vec3 eyeDir){
 
 }
 
+vec3 computeSpecularLight(vec3 eyeDir, vec3 lightDir, vec3 normalVector, vec3 lightColor){
+  
+  // Blinn
+  vec3 blinnSpecular = vec3(pow(clamp(dot(normalize(eyeDir+lightDir), normalVector),0.0,1.0), SpecShine)) * lightColor;
+
+  //Phong
+  vec3 reflection = -reflect(normalVector, lightDir); // dovrebbe essere light dir e normalVector
+  vec3 phongSpecular = vec3(pow(clamp(dot(eyeDir,reflection),0.0,1.0), SpecShine)) * lightColor;
+
+  return blinnSpecular * specularType.x + phongSpecular*specularType.y ;
+}
+
 void main() {
 
   vec3 nNormal = normalize(fsNormal); /* normalizza sempre perche è bene farlo */
@@ -126,10 +139,8 @@ void main() {
   //ambient
   vec3 ambientColor = computeAmbientLight(nNormal) * ambientMatColor;
   //specular
-  vec3 L1_reflection = -reflect(lDir, fsNormal);
-  vec3 L1_specular = pow(clamp(dot(L1_reflection,eyedirVec), 0.0, 1.0), SpecShine) * lColor;
-  vec3 specular = specularColor * L1_specular; 
-
+  vec3 specular = computeSpecularLight(eyedirVec, lDir, nNormal, lColor);
+  vec3 specularColor = specular * specCol;
   //Final Color
-  outColor = vec4(clamp(ambientColor + diffuseColor + emitColor, 0.0, 1.0), 1.0);
+  outColor = vec4(clamp(ambientColor + diffuseColor + emitColor + specularColor, 0.0, 1.0), 1.0);
   }

@@ -198,10 +198,28 @@
           </div>
         </div>
         <div id="hemispheric-dir" style="display:none;">
-          &theta; <input type="range" class="custom-range" min="0" max="180" step="1" id="alfa_ambient"><br /> <br />
-          &phi; <input type="range" class="custom-range" min="-90" max="90" step="1" id="beta_ambient"></div>
-
-    </section>
+          &theta; <input type="range" class="custom-range" min="0" max="360" step="1" id="alfa_ambient"><br /> <br />
+          &phi; <input type="range" class="custom-range" min="-180" max="180" step="1" id="beta_ambient"></div>
+</section>
+<hr>
+<section class="demo">
+  <div class='col-4'>
+    <div class="row d-flex justify-content-center">
+      <div class="col-3 offset-1 justify-content-center">
+        <label for="class">Specular</label>
+      </div>
+      <div class="col-7 offset-1 justify-content-center">
+        <select class="mdb-select md-form" style="background-color: azure;" id="specular-type-select"
+          onchange="specularTypeSelection()">
+          <option value="0" selected>None</option>
+          <option value="1">Blinn</option>
+          <option value="2">Phong</option>
+        </select>
+      </div>
+    </div>
+    <div id="spec-shine-div" style="display:none;">
+      SpecShine <input type="range" class="custom-range" min="1" max="200"id="spec_shine"></div>
+</section>
 
     <div class="row">
       <div id="model-class">
