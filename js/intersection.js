@@ -34,31 +34,26 @@ function onMouseUp(ev){
     
         var min_index=+Infinity;
         var distance_hit_min=+Infinity;
-        for(i = 0; i < dataset.length; i++){
-        if(dataset[i].x < (min_x+(x_range.valueLow*(max_x-min_x)/100)) || dataset[i].x> (x_range.valueHigh*(max_x-min_x)/100) || 
-            dataset[i].y < (min_y+(y_range.valueLow*(max_y-min_y)/100)) || dataset[i].y > (y_range.valueHigh*(max_y-min_y)/100) ||
-            dataset[i].z < (min_z+(z_range.valueLow*(max_z-min_z)/100)) || dataset[i].z > (z_range.valueHigh*(max_z-min_z)/100)){
-            continue;
-        }
+        for(i = 0; i < items.length && items[i].get_display(); i++){
     
-        var objSelected=$('#class'+dataset[i].class).val();
-        var ele=listOfPossibleModels[objSelected];
-    
-    
-        if (ele=="Sphere"){
-            distance_hit = raySphereIntersection(rayStartPoint, normalisedRayDir, items[i], RADIUS); //in the sphere there is no need to pass the model matrix
-        }
-        else{ // cubo 
-            distance_hit=RayOBBIntersection(rayStartPoint,normalisedRayDir,[-1.0, -1.0, -1.0].map(function(x) { return x * RADIUS}) ,[1.0, 1.0, 1.0].map(function(x) { return x * RADIUS}),items[i].worldM,RADIUS);
+            var objSelected=$('#class'+dataset[i].class).val();
+            var ele=listOfPossibleModels[objSelected];
+        
+        
+            if (ele=="Sphere"){
+                distance_hit = raySphereIntersection(rayStartPoint, normalisedRayDir, items[i], RADIUS); //in the sphere there is no need to pass the model matrix
+            }
+            else{ // cubo 
+                distance_hit=RayOBBIntersection(rayStartPoint,normalisedRayDir,[-1.0, -1.0, -1.0].map(function(x) { return x * RADIUS}) ,[1.0, 1.0, 1.0].map(function(x) { return x * RADIUS}),items[i].get_worldMatrix(),RADIUS);
 
-        }
-    
-        if(distance_hit>0){
-            min_index = distance_hit < distance_hit_min ? i : min_index; // prendi l'oggett
-            distance_hit_min=  distance_hit < distance_hit_min   ? distance_hit  : distance_hit_min; 
-        }
-        }
-    
+            }
+        
+            if(distance_hit>0){
+                min_index = distance_hit < distance_hit_min ? i : min_index; // prendi l'oggett
+                distance_hit_min=  distance_hit < distance_hit_min   ? distance_hit  : distance_hit_min; 
+            }
+            }
+        
         if(min_index==+Infinity && $('#text').css('z-index')==1){
             $('#text').css('z-index',-1);
             object_selected=-1;
@@ -82,7 +77,7 @@ function onMouseUp(ev){
   function raySphereIntersection(rayStartPoint, rayNormalisedDir, sphereCentre, sphereRadius){
     //Distance between sphere origin and origin of ray
     var t;
-    var l = [sphereCentre.x*MULTIPLICATIVE_FACTOR - rayStartPoint[0], sphereCentre.y*MULTIPLICATIVE_FACTOR - rayStartPoint[1], sphereCentre.z*MULTIPLICATIVE_FACTOR - rayStartPoint[2]];
+    var l = [sphereCentre.get_x()*MULTIPLICATIVE_FACTOR - rayStartPoint[0], sphereCentre.get_y()*MULTIPLICATIVE_FACTOR - rayStartPoint[1], sphereCentre.get_z()*MULTIPLICATIVE_FACTOR - rayStartPoint[2]];
     var l_squared = l[0] * l[0] + l[1] * l[1] + l[2] * l[2];
     var r_squared=sphereRadius*sphereRadius;
     //If this is true, the ray origin is inside the sphere so it doesn't collides

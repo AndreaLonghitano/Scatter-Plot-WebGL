@@ -170,11 +170,22 @@ var callbacks={
                 // PCA
                 case KEY_CODE.P:
                   pca=!pca;
+                  if(!($('#x_range').prop('disabled'))){
+                    $(".multirange").prop('disabled', true);
+                    items.forEach((element,index) => {
+                      if(items[index].get_display()){
+                         dataset_pca.push([element.get_x(),element.get_y(),element.get_z()]);
+                         selected_element.push(index);
+                      }
+                    });
+                    var eigenvectors = PCA.getEigenVectors(dataset_pca);
+                    adjusted_data_x=PCA.computeAdjustedData(dataset_pca,eigenvectors[0],eigenvectors[1]).adjustedData[0];
+                    adjusted_data_y=PCA.computeAdjustedData(dataset_pca,eigenvectors[0],eigenvectors[1]).adjustedData[1];
+                  }
                 break;
-
-        }
-      }
-    },
+                }
+              }
+            },
 
     toggleFullScreen:()=>{
         if(!document.fullscreenElement) {

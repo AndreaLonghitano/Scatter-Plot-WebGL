@@ -65,11 +65,11 @@
 
   //compute the dataset for pca and k_means
   var i=0;
-  dataset.forEach((element)=> dataset_pca.push([element.x,element.y,element.z]));
+  //dataset.forEach((element)=> dataset_pca.push([element.x,element.y,element.z]));
   dataset.forEach((element)=> dataset_kMeans.push([element.x,element.y,element.z]));
-  var eigenvectors = PCA.getEigenVectors(dataset_pca);
-  adjusted_data_x=PCA.computeAdjustedData(dataset_pca,eigenvectors[0],eigenvectors[1]).adjustedData[0];
-  adjusted_data_y=PCA.computeAdjustedData(dataset_pca,eigenvectors[0],eigenvectors[1]).adjustedData[1];
+  //var eigenvectors = PCA.getEigenVectors(dataset_pca);
+  //adjusted_data_x=PCA.computeAdjustedData(dataset_pca,eigenvectors[0],eigenvectors[1]).adjustedData[0];
+  //adjusted_data_y=PCA.computeAdjustedData(dataset_pca,eigenvectors[0],eigenvectors[1]).adjustedData[1];
   var k_means=new KMeans(dataset_kMeans,centroids,rate_k_means,distance="manhattan");
   values=k_means.performSteps();
 
@@ -167,6 +167,15 @@ class Item {
       this.rotZ=Math.floor(Math.random() * (360 - 0 + 1) + 0);
       this.initialQuaternion=Quaternion.fromEuler(utils.degToRad(this.rotZ),utils.degToRad(this.rotX),utils.degToRad(this.rotY)); // default order is ZYX
       this.worldM = utils.MakeWorld(this.x*MULTIPLICATIVE_FACTOR,this.y*MULTIPLICATIVE_FACTOR,this.z*MULTIPLICATIVE_FACTOR,this.rotX,this.rotY,this.rotZ,RADIUS);
+      this.display=true;
+  }
+
+  get_display(){
+    return this.display;
+  }
+
+  set_display(val){
+    this.display=val;
   }
 
   set_rotX(x){
@@ -203,6 +212,10 @@ class Item {
   get_z(){
     return this.z;
   }
+
+  get_worldMatrix(){
+    return this.worldM;
+  }
   get_quaternion(){
     return this.initialQuaternion;
   }
@@ -218,18 +231,16 @@ function animate(){
   }
   var quadratic;
   var point;
-  for (var i=0;i<items.length;i++){
-    point=bezier.quadraticBezier([dataset[i].x,dataset[i].y,dataset[i].z],control_quadratic_points[i],[adjusted_data_x[i],adjusted_data_y[i],0.0],time/maxT);
-    rotation=QuaternionToEuler(items[i].get_quaternion().slerp(Quaternion.fromEuler(utils.degToRad(45),0,0,order="XYZ"))(time/maxT));
-    items[i].set_pos(utils.MakeWorld(point.x*MULTIPLICATIVE_FACTOR,point.y*MULTIPLICATIVE_FACTOR,point.z*MULTIPLICATIVE_FACTOR,utils.radToDeg(rotation[0]),utils.radToDeg(rotation[1]),utils.radToDeg(rotation[2]),RADIUS));
-    items[i].set_x(point.x);
-    items[i].set_y(point.y);
-    items[i].set_z(point.z);
-    items[i].set_rotX(utils.radToDeg(rotation[0]));
-    items[i].set_rotY(utils.radToDeg(rotation[1]));
-    items[i].set_rotZ(utils.radToDeg(rotation[2]));
-
-
+  for (var i=0;i<selected_element.length;i++){
+    point=bezier.quadraticBezier([dataset_pca[i][0],dataset_pca[i][1],dataset_pca[i][2]],control_quadratic_points[i],[adjusted_data_x[i],adjusted_data_y[i],0.0],time/maxT);
+    rotation=QuaternionToEuler(items[selected_element[i]].get_quaternion().slerp(Quaternion.fromEuler(utils.degToRad(45),0,0,order="XYZ"))(time/maxT));
+    items[selected_element[i]].set_pos(utils.MakeWorld(point.x*MULTIPLICATIVE_FACTOR,point.y*MULTIPLICATIVE_FACTOR,point.z*MULTIPLICATIVE_FACTOR,utils.radToDeg(rotation[0]),utils.radToDeg(rotation[1]),utils.radToDeg(rotation[2]),RADIUS));
+    items[selected_element[i]].set_x(point.x);
+    items[selected_element[i]].set_y(point.y);
+    items[selected_element[i]].set_z(point.z);
+    items[selected_element[i]].set_rotX(utils.radToDeg(rotation[0]));
+    items[selected_element[i]].set_rotY(utils.radToDeg(rotation[1]));
+    items[selected_element[i]].set_rotZ(utils.radToDeg(rotation[2]));
   }
   time+=VELOCITY_PCA;
   if(time>=maxT){
@@ -278,9 +289,10 @@ function animate(){
 
     for(i = 0; i < dataset.length; i++){
 
-      if(dataset[i].x < (min_x+(x_range.valueLow*(max_x-min_x)/100)) || dataset[i].x> (x_range.valueHigh*(max_x-min_x)/100) || 
-          dataset[i].y < (min_y+(y_range.valueLow*(max_y-min_y)/100)) || dataset[i].y > (y_range.valueHigh*(max_y-min_y)/100) ||
-          dataset[i].z < (min_z+(z_range.valueLow*(max_z-min_z)/100)) || dataset[i].z > (z_range.valueHigh*(max_z-min_z)/100)){
+      if(dataset[i].x < (min_x+(x_range.valueLow*(max_x-min_x)/100)) || dataset[i].x>(max_x-(1-x_range.valueHigh/100)*(max_x-min_x)) || 
+          dataset[i].y < (min_y+(y_range.valueLow*(max_y-min_y)/100)) || dataset[i].y >(max_y-(1-y_range.valueHigh/100)*(max_y-min_y)) ||
+          dataset[i].z < (min_z+(z_range.valueLow*(max_z-min_z)/100)) || dataset[i].z >(max_z-(1- z_range.valueHigh/100)*(max_z-min_z))){
+          items[i].set_display(false);
           continue;
       }
       
@@ -570,9 +582,9 @@ var bezier={
 
 
 function initializeControlPoint(){
-  dataset.forEach((element,index)=>{
+  dataset_pca.forEach((element,index)=>{
     var sign=Math.floor(Math.random()*2) == 1 ? 1 : -1;
-    control_quadratic_points[index]=[(element.x+adjusted_data_x[index])/2 + sign*Math.random(),(element.y+adjusted_data_y[index])/2 + sign*Math.random(),(element.z + 0) +sign*Math.random()];
+    control_quadratic_points[index]=[(element[0]+adjusted_data_x[index])/2 + sign*Math.random(),(element[1]+adjusted_data_y[index])/2 + sign*Math.random(),(element[2] + 0) +sign*Math.random()];
   })
 
 }

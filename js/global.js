@@ -49,6 +49,7 @@ var adjusted_data_y;
 var maxT=3.0;
 var time=0.0;
 var control_quadratic_points=[];
+var selected_element=[];
 
 
 
