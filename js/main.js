@@ -57,7 +57,7 @@
 
   cubeObjStr=await utils.get_objstr(baseDir+"/model/cube.obj");
   cube=new OBJ.Mesh(cubeObjStr);
-  sphereObjStr=await utils.get_objstr(baseDir+"/model/sphere.obj");
+  sphereObjStr=await utils.get_objstr(baseDir+"/model/sphere_smooth.js");
   sphere=new OBJ.Mesh(sphereObjStr);
   models={'Cube':cube,'Sphere':sphere};
 
@@ -112,6 +112,16 @@
   perspectiveMatrix = utils.MakePerspective(90, gl.canvas.width/gl.canvas.height, 0.1, 1000);
 
 
+
+  for (let i = 0; i < sphere.vertices.length; i++) {
+    sphere.vertices[i]= sphere.vertices[i]/3;
+    
+  }
+
+  for (let i = 0; i < sphere.vertexNormals.length; i++) {
+    sphere.vertexNormals[i]= sphere.vertexNormals[i]/3;
+    
+  }
   createVaoObjects(programs[0],"Sphere",vertices=sphere.vertices,normals=sphere.vertexNormals,indices=sphere.indices);
   createVaoObjects(programs[0],"Cube",vertices=cube.vertices,normals=cube.vertexNormals,indices=cube.indices);
   createVaoObjects(programs[1],"Lines",lines_position);

@@ -216,50 +216,50 @@ $("#showNegativeAxes").click(()=>{
 });
 
 
-$('#spec_shine').on('change', function() {
+$('#spec_shine').on('input change', function() {
   SpecShine=this.value;
 });
-
-$("#cone_out").on('change',function() {
+// TODO: FIX error cone_in, cone_out
+$("#cone_out").on('input change',function() {
   lightConeOut=this.value;
 });
 
-$("#cone_in").on('change',function(){
+$("#cone_in").on('input change',function(){
   lightConeIn=this.value/100;
 });
 
-$("#x_light").on('change',function(){
+$("#x_light").on('input change',function(){
   dirLightPos_x=this.value;
 });
 
-$("#y_light").on('change',function(){
+$("#y_light").on('input change',function(){
   dirLightPos_y=this.value;
 });
 
-$("#z_light").on('change',function(){
+$("#z_light").on('input change',function(){
   dirLightPos_z=this.value;
   console.log(dirLightPos_z);
 });
 
-$("#alfa_light").on('change',function(){
+$("#alfa_light").on('input change',function(){
   var t = -utils.degToRad(this.value);
   var p = -utils.degToRad($("#beta_light").val());
 	directionalLight = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
 });
 
-$("#beta_light").on('change',function(){
+$("#beta_light").on('input change',function(){
   var t = -utils.degToRad($("#alfa_light").val());
   var p = -utils.degToRad(this.value);
 	directionalLight = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
 });
 
-$("#alfa_ambient").on('change',function(){
+$("#alfa_ambient").on('input change',function(){
   var t = -utils.degToRad(this.value);
   var p = -utils.degToRad($("#beta_ambient").val());
   ambientLightDir = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
 });
 
-$("#beta_ambient").on('change',function(){
+$("#beta_ambient").on('input change',function(){
   var t = -utils.degToRad($("#alfa_ambient").val());
   var p = -utils.degToRad(this.value);
   ambientLightDir = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
