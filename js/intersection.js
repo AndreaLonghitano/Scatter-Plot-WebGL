@@ -1,5 +1,5 @@
 function onMouseUp(ev){
-
+    console.log("FIREEED");
     //This is a way of calculating the coordinates of the click in the canvas taking into account its possible displacement in the page
     var top = 0.0, left = 0.0;
     canvas = gl.canvas;
@@ -16,6 +16,7 @@ function onMouseUp(ev){
      var normY = 1 - (2*y) / gl.canvas.height;
   
      if(Math.abs(normX)<=1 && Math.abs(normY)<=1){
+        console.log("FIREEED");
   
         /* Perspective*view*world*/
         //We need to go through the transformation pipeline in the inverse order so we invert the matrices
@@ -35,7 +36,6 @@ function onMouseUp(ev){
         var min_index=+Infinity;
         var distance_hit_min=+Infinity;
         for(i = 0; i < items.length && items[i].get_display(); i++){
-    
             var objSelected=$('#class'+dataset[i].class).val();
             var ele=listOfPossibleModels[objSelected];
         
@@ -45,7 +45,6 @@ function onMouseUp(ev){
             }
             else{ // cubo 
                 distance_hit=RayOBBIntersection(rayStartPoint,normalisedRayDir,[-1.0, -1.0, -1.0].map(function(x) { return x * RADIUS}) ,[1.0, 1.0, 1.0].map(function(x) { return x * RADIUS}),items[i].get_worldMatrix(),RADIUS);
-
             }
         
             if(distance_hit>0){

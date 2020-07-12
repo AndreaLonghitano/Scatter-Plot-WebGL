@@ -306,28 +306,18 @@ function animate(){
       var ele=listOfPossibleModels[objSelected];
 
       var worldMatrix=items[i].worldM;
-
       var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
       var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
-
       var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix),[cx,cy,cz,1.0]);
-      
-      sliderPosLight(); //Update Light postions
       var lightPosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix),[dirLightPos_x,dirLightPos_y,dirLightPos_z,1.0]);
-      
-      sliderLightConesChange(); //update Light Cones
-      sliderSpecShineChange(); //update specular shine
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
-      sliderLightChange(); //This update directionalLight based on the sliders
       var directionalLightTrasformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
-
-      sliderAmbientDirChange(); //Update direction hemispheric ambient
       var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,ambientLightDir));
-
 
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
       
       var color= i==object_selected ? cubeMaterialColor: colorDiffuseClass[dataset[i].class];
+
       gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
       gl.uniform3fv(programs[0].materialDiffColorHandle, color);
       gl.uniform3fv(programs[0].lightColorHandle,  directionalLightColor);
@@ -500,35 +490,6 @@ function showPyramid(negative_axes){
     }
 }
 
-
-
-
-
-function sliderLightChange(){
-  var t = -utils.degToRad(document.getElementById("alfa_light").value);
-	var p = -utils.degToRad(document.getElementById("beta_light").value);
-	directionalLight = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
-}
-
-function sliderAmbientDirChange(){
-  var t = -utils.degToRad(document.getElementById("alfa_ambient").value);
-	var p = -utils.degToRad(document.getElementById("beta_ambient").value);
-	ambientLightDir = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
-}
-
-function sliderPosLight(){
-  dirLightPos_x = document.getElementById("x_light").value;
-  dirLightPos_y = document.getElementById("y_light").value;
-  dirLightPos_z = document.getElementById("z_light").value;
-}
-function sliderLightConesChange(){
-  lightConeOut = document.getElementById("cone_out").value;
-  lightConeIn = document.getElementById("cone_in").value /100;
-}
-
-function sliderSpecShineChange(){
-  SpecShine = document.getElementById("spec_shine").value;
-}
 
 function ambientTypeSelection(){
   var type = document.getElementById("ambient-type-select").value;
