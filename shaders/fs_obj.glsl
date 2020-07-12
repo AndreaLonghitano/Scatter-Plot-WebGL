@@ -50,9 +50,9 @@ vec3 computeLightDir(vec3 lightPos, vec3 lightDir) {
 	vec3 pointLightDir = normalize(lightPos - fsPosition);
 	
 	//Spot
-	//vec3 spotLightDir = normalize(lightPos - fsPosition);
+	vec3 spotLightDir = normalize(lightPos - fsPosition);
 
-	return directLightDir * lightType.x + pointLightDir * lightType.y ;//+ spotLightDir * lightType.z;
+	return directLightDir * lightType.x + pointLightDir * lightType.y + spotLightDir * lightType.z;
 }
 
 vec3 computeLightColor(vec3 lightPos){
@@ -66,12 +66,12 @@ vec3 computeLightColor(vec3 lightPos){
 	vec3 pointLightCol = L1_lightColor * pow(L1_Target / length(lightPos - fsPosition), L1_Decay);
 	
 	//Spot
-	// vec3 spotLightDir = normalize(lightPos - fsPosition);
-	// float CosAngle = dot(spotLightDir, L1_lightDirection);
-	// vec4 spotLightCol = L1_lightColor * pow(L1_Target / length(lightPos - fsPosition), L1_Decay) *
-	// 					clamp((CosAngle - LCosOut) / (LCosIn - LCosOut), 0.0, 1.0);
+	vec3 spotLightDir = normalize(lightPos - fsPosition);
+	float CosAngle = dot(spotLightDir, L1_lightDirection);
+	vec3 spotLightCol = L1_lightColor * pow(L1_Target / length(lightPos - fsPosition), L1_Decay) *
+						clamp((CosAngle - LCosOut) / (LCosIn - LCosOut), 0.0, 1.0);
 
-	return directLightCol * lightType.x + pointLightCol * lightType.y; //+ spotLightCol * lightType.z;
+	return directLightCol * lightType.x + pointLightCol * lightType.y + spotLightCol * lightType.z;
 }
 
 vec3 computeAmbientLight(vec3 normalVector){

@@ -119,7 +119,7 @@ var ambientTypeDict = {
 		1: [1,0,0,0], //ambient
 		2: [0,1,0,0] //hemispheric
 }
-var ambientType = ambientTypeDict[0];
+var ambientType = ambientTypeDict[1];
 var dirAmbAlpha = -utils.degToRad(90);
 var dirAmbBeta  = -utils.degToRad(0);
 var ambientLightDir = [Math.cos(dirAmbAlpha) * Math.cos(dirAmbBeta),

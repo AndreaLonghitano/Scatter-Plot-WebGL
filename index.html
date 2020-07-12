@@ -152,14 +152,17 @@
           </div>
         </div>
         <div id="direct" style="display:block;">
-          &theta; <input type="range" class="custom-range" min="0" max="180" step="1" id="alfa_light"><br /> <br />
+          &theta; <input type="range" class="custom-range" min="0" max="180" step="1" id="alfa_light"><br />
           &phi; <input type="range" class="custom-range" min="-90" max="90" step="1" id="beta_light"></div>
         <div id="point" style="display:none;">
-          pos x <input type="range" class="custom-range" min="-250" max="250" step="1" id="x_light"><br /> <br />
-          pos y <input type="range" class="custom-range" min="-250" max="250" step="1" id="y_light"><br /> <br />
+          pos x <input type="range" class="custom-range" min="-250" max="250" step="1" id="x_light"><br />
+          pos y <input type="range" class="custom-range" min="-250" max="250" step="1" id="y_light"><br />
           pos z <input type="range" class="custom-range" min="-250" max="250" step="1" id="z_light"></div>
-
+          <div id="cone" style="display:none;">
+            ConeOut <input type="range" class="custom-range" min="0" max="150" id="cone_out"><br />
+            ConeIn <input type="range" class="custom-range" min="0" max="100" id="cone_in"></div>
     </section>
+    <hr>
 
     <section class="demo">
       <div class='col-4'>
@@ -189,7 +192,7 @@
             <select class="mdb-select md-form" style="background-color: azure;" id="ambient-type-select"
               onchange="ambientTypeSelection()">
               <option value="0">None</option>
-              <option value="1">Ambient</option>
+              <option value="1" selected>Ambient</option>
               <option value="2">Hemispheric</option>
             </select>
           </div>
