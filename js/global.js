@@ -120,7 +120,7 @@ var ambientTypeDict = {
 		1: [1,0,0,0], //ambient
 		2: [0,1,0,0] //hemispheric
 }
-var ambientType = ambientTypeDict[0];
+var ambientType = ambientTypeDict[1];
 var dirAmbAlpha = -utils.degToRad(90);
 var dirAmbBeta  = -utils.degToRad(0);
 var ambientLightDir = [Math.cos(dirAmbAlpha) * Math.cos(dirAmbBeta),
@@ -141,6 +141,15 @@ var diffuseTypeDict= {
 }
 var diffuseType = diffuseTypeDict[0];
 
+//Specular Light
+var specularTypeDict = {
+  0: [0,0,0,0], //none
+  1: [1,0,0,0], //Blinn
+  2: [0,1,0,0] //Phong
+}
+
+var specularType = specularTypeDict[0];
+
 //Emission
 var materialEmissionColor = [0.0, 0.0, 0.0];
 
@@ -148,7 +157,7 @@ var materialEmissionColor = [0.0, 0.0, 0.0];
 
 var colorAxes=[0.5, 0.5, 0.5];
 
-var SpecShine = 50;
+var SpecShine = 40;
 var specularColor = [1.0,  1.0,  1.0];
 
 var lastUpdateTime = (new Date).getTime();

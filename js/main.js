@@ -85,6 +85,8 @@
   programs[0].lightPosHandle = gl.getUniformLocation(programs[0], "L1_Pos");
   programs[0].lightDecayHandle = gl.getUniformLocation(programs[0], "L1_Decay");
   programs[0].lightTargetHandle = gl.getUniformLocation(programs[0], "L1_Target");
+  programs[0].lightConeOutHandle = gl.getUniformLocation(programs[0], "L1_ConeOut");
+  programs[0].lightConeInHandle = gl.getUniformLocation(programs[0], "L1_ConeIn");
   programs[0].lightTypeHandle = gl.getUniformLocation(programs[0], "lightType");
   programs[0].AmbientMatColHandle = gl.getUniformLocation(programs[0], "ambientMatColor");
   programs[0].AmbientLightColHandle = gl.getUniformLocation(programs[0], "ambientLightColor");
@@ -92,8 +94,9 @@
   programs[0].AmbienttDirHandle = gl.getUniformLocation(programs[0], "ambientDir");
   programs[0].AmbientTypeHandle = gl.getUniformLocation(programs[0], "ambientType");
   programs[0].MatEmisColHandle = gl.getUniformLocation(programs[0], "emitColor");
+  programs[0].specularTypehandle = gl.getUniformLocation(programs[0], "specularType");
   programs[0].specShineHandle = gl.getUniformLocation(programs[0], "SpecShine");
-  programs[0].specularColorHandle = gl.getUniformLocation(programs[0], "specularColor");
+  programs[0].specularColorHandle = gl.getUniformLocation(programs[0], "specCol");
   programs[0].lightDirMatrixPositionHandle = gl.getUniformLocation(programs[0], 'lightDirMatrix');
   programs[0].eyePosHandler = gl.getUniformLocation(programs[0], "eyePos");
 
@@ -311,7 +314,9 @@ function animate(){
       
       sliderPosLight(); //Update Light postions
       var lightPosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix),[dirLightPos_x,dirLightPos_y,dirLightPos_z,1.0]);
-
+      
+      sliderLightConesChange(); //update Light Cones
+      sliderSpecShineChange(); //update specular shine
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
       sliderLightChange(); //This update directionalLight based on the sliders
       var directionalLightTrasformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
@@ -330,6 +335,8 @@ function animate(){
       gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
       gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
       gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
+      gl.uniform1f(programs[0].lightConeOutHandle, lightConeOut);
+      gl.uniform1f(programs[0].lightConeInHandle, lightConeIn);
       gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
       gl.uniform3fv(programs[0].AmbientLightColHandle,  ambientLightColor);
       gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
@@ -337,6 +344,7 @@ function animate(){
       gl.uniform3fv(programs[0].AmbientMatColHandle, color);
       gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
       gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
+      gl.uniform4fv(programs[0].specularTypehandle, specularType);
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
@@ -513,6 +521,14 @@ function sliderPosLight(){
   dirLightPos_y = document.getElementById("y_light").value;
   dirLightPos_z = document.getElementById("z_light").value;
 }
+function sliderLightConesChange(){
+  lightConeOut = document.getElementById("cone_out").value;
+  lightConeIn = document.getElementById("cone_in").value /100;
+}
+
+function sliderSpecShineChange(){
+  SpecShine = document.getElementById("spec_shine").value;
+}
 
 function ambientTypeSelection(){
   var type = document.getElementById("ambient-type-select").value;
@@ -535,10 +551,28 @@ function lightTypeSelection(){
   if (type == 0) {
     document.getElementById("direct").style.display = "block";
     document.getElementById("point").style.display = "none";
+    document.getElementById("cone").style.display = "none";
   }
   else if (type == 1){
     document.getElementById("point").style.display = "block";
     document.getElementById("direct").style.display = "none";
+    document.getElementById("cone").style.display = "none";
+  }
+  else {
+    document.getElementById("point").style.display = "block";
+    document.getElementById("direct").style.display = "block";
+    document.getElementById("cone").style.display = "block";
+  }
+}
+
+function specularTypeSelection(){
+  var type = document.getElementById("specular-type-select").value;
+  specularType = specularTypeDict[type];
+  if (type != 0){
+    document.getElementById("spec-shine-div").style.display = "block";
+  }
+  else {
+    document.getElementById("spec-shine-div").style.display = "none";
   }
 }
 
