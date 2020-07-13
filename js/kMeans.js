@@ -60,7 +60,6 @@ KMeans.prototype.performSteps = function() {
 
    for(var i=0;i<this.rate && (!this.end);i++){
         // update point-to-centroid assignments
-
         this.points.forEach((element,index) => {
             this.assignment[index] = this.classify(element, this.distance);
         });

@@ -63,16 +63,6 @@
 
   
 
-  //compute the dataset for pca and k_means
-  var i=0;
-  //dataset.forEach((element)=> dataset_pca.push([element.x,element.y,element.z]));
-  dataset.forEach((element)=> dataset_kMeans.push([element.x,element.y,element.z]));
-  //var eigenvectors = PCA.getEigenVectors(dataset_pca);
-  //adjusted_data_x=PCA.computeAdjustedData(dataset_pca,eigenvectors[0],eigenvectors[1]).adjustedData[0];
-  //adjusted_data_y=PCA.computeAdjustedData(dataset_pca,eigenvectors[0],eigenvectors[1]).adjustedData[1];
-  var k_means=new KMeans(dataset_kMeans,centroids,rate_k_means,distance="manhattan");
-  values=k_means.performSteps();
-
   
   gl.useProgram(programs[0]);
   programs[0].positionAttributeLocation = gl.getAttribLocation(programs[0], "inPosition");  
@@ -238,7 +228,7 @@ class Item {
   }
 }
 
-function animate(){
+function animate_pca(){
   if (!time){
     initializeControlPoint();
   }
@@ -266,6 +256,10 @@ function animate(){
   }         
 }
 
+function animate_kmeans(){
+
+}
+
   var updateScene = function () {
     stats.begin();
     drawScene();
@@ -289,8 +283,43 @@ function animate(){
   }
 
   function drawScene() {
-    if(pca){
-      animate();
+    if(pca && !kmeans){
+      animate_pca();
+    }
+    else if(kmeans && count_frames==FRAME_RATE_KMEANS){
+      if(ObjKMeans.end){
+        kmeans=!kmeans;
+      }
+      else {
+        //console.log("Centroid");
+        last_centroid=ObjKMeans.centroids;
+        new_values=ObjKMeans.performSteps();
+        //console.log("New Value");
+        //console.log(new_values.centroids);
+
+
+        //calcola qui il punto di controllo per ogni centroid in maniera random 
+
+
+
+        count_frames = 0;
+      }
+    } else if (kmeans && !(count_frames==FRAME_RATE_KMEANS)){
+      count_frames += 1;
+
+      // per ogni centroid (1,2,3) animalo e muovilo... 
+      // setta le properita di luce e disegna il modello
+      
+      // per ogni centroid calcola il nuovo punto tipo cosi
+      //point=bezier.quadraticBezier([last_centroid[i][0],last_centroid[i][1],last_centroid[i][2]],control_quadratic_points[i],[new_values.centroids[i],adjusted_data_y[i],0.0],count_frames/FRAME_RATE_KMEANS);
+
+
+
+      //render
+
+
+      
+
     }
     resize(gl.canvas);
     gl.clearColor(0.85, 0.85, 0.85, 1.0);

@@ -16,6 +16,14 @@ const KEY_CODE = {
   "ARROWRIGHT":39
 };
 
+const DISTANCE_KMEANS={
+  0:"euclidean",
+  1:"manhattan",
+  2:"max",
+  3:"min",
+  4:"euclidean_square"
+}
+
 const MAX_MOVEMENT_X=250.0;
 const MAX_MOVEMENT_Z=250.0; 
 const MAX_MOVEMENT_Y=250.0;
@@ -33,16 +41,13 @@ const VELOCITY_PCA=0.01;
 
 var items;
 var dataset,classes; 
-var dataset_pca=new Array();
-var dataset_kMeans=new Array();
-var rate_k_means="slow";
-var centroids;
 var sphere;
 var cube;
 var pyramid;
 var listOfPossibleModels;
 var models;
 //pca
+var dataset_pca=new Array();
 var pca=false;
 var adjusted_data_x;
 var adjusted_data_y;
@@ -50,6 +55,17 @@ var maxT=3.0;
 var time=0.0;
 var control_quadratic_points=[];
 var selected_element=[];
+
+// kmeans
+var kmeans=false;
+var ObjKMeans;
+var rate_k_means="slow";
+var centroids;
+var dataset_kMeans=new Array();
+const FRAME_RATE_KMEANS=60;
+var count_frames;
+var last_centroid=new Array();
+var new_values;
 
 
 

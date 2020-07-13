@@ -2,7 +2,7 @@ var callbacks={
 
     onkeyUp: (event) =>{
         var element=document.getElementById(event.key.toUpperCase());
-        if (element && element.id!=='P'){
+        if (element && element.id!=='P' && element.id!=='K'){
           element.style.backgroundColor=color_button;
         }
 
@@ -164,6 +164,23 @@ var callbacks={
 
                //k-means
                case KEY_CODE.K:
+                 // once you run kmeans you cannot stop it
+                 if(!kmeans){
+                  kmeans=!kmeans;
+                  if(!($('#x_range').prop('disabled'))){
+                    $(".multirange").prop('disabled', true);
+                  items.forEach((element,index) => {
+                    if(items[index].get_display()){
+                      dataset_kMeans.push([element.get_x(),element.get_y(),element.get_z()]);
+                      selected_element.push(index);
+                    }
+                  });
+                  ObjKMeans=new KMeans(dataset_kMeans,centroids,rate_k_means,DISTANCE_KMEANS[0]);
+                  $("#distance_selection").prop('disabled', true);
+                  count_frames=0;
+                  last_centroid=centroids;
+                }
+                }
 
                 break;
   
@@ -194,21 +211,6 @@ var callbacks={
     },
   }
 
-$("#vel_k_means").on("input change", function() { 
-  switch(this.value){
-      case "0":
-        rate_k_means="slow";
-      break;
-      case "1":
-        rate_k_means="medium";
-      break;
-      case "2":
-        rate_k_means="fast";
-      break;
-
-  }
-    
-});
 
 
 $("#showNegativeAxes").click(()=>{
@@ -264,6 +266,7 @@ $("#beta_ambient").on('input change',function(){
   var p = -utils.degToRad(this.value);
   ambientLightDir = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
 });
+
 
 
 

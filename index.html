@@ -112,22 +112,30 @@
     </div>
 
     <!--K means-->
+
+
+
     <hr />
     <div class="row">
-      <div class="col-6 d-flex justify-content-center">
-        <button type="button" class="btn btn-light" id="K">K</button>
+      <div class="col-2 offset-1 justify-content-center">
+        <button type="button" class="btn btn-light" id="K">K-means</button>
       </div>
-      <div class="col-6 command">
-        K-Means
+
+      <div class="col-6 offset-2 justify-content-center">
+        <select class="mdb-select md-form" style="background-color: azure;" id="distance_selection">
+              <option value="0">Euclidean</option>
+              <option value="1">Manhattan</option>
+              <option value="2">Min</option>
+              <option value="3">Max</option>
+              <option value="4">Euclidean Square</option>
+            </select>
       </div>
     </div>
+    <br/>
 
     <div class="row">
       <div class="col-4">
         <label for="customRange2">Velocity</label>
-      </div>
-      <div class='col-4'>
-        <input type="range" class="custom-range" min="0" max="2" id="vel_k_means">
       </div>
     </div>
     <hr />
