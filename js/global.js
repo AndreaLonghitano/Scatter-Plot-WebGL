@@ -61,9 +61,13 @@ var kmeans=false;
 var ObjKMeans;
 var rate_k_means="slow";
 var centroids;
+var centroid_items=new Array();
 var dataset_kMeans=new Array();
+var anim_points=new Array();
 const FRAME_RATE_KMEANS=60;
-var count_frames;
+var count_frames=60;
+var init_kmeans = true;
+var centroid_control_points = [];
 var last_centroid=new Array();
 var new_values;
 
