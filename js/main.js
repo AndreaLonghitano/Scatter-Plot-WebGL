@@ -46,6 +46,8 @@
     max_y = Math.max(dataset[index].y, max_y);
     items[index] = new Item([dataset[index].x, dataset[index].y, dataset[index].z], dataset[index].class);
   });
+
+  
   // centroids for k-means
   await utils.get_json(baseDir + "/model/centroids.json", function (jsonFile) {
     centroids = jsonFile.data;
@@ -107,15 +109,6 @@
 
 
 
-  // for (let i = 0; i < sphere.vertices.length; i++) {
-  //   sphere.vertices[i]= sphere.vertices[i]/3;
-
-  // }
-
-  // for (let i = 0; i < sphere.vertexNormals.length; i++) {
-  //   sphere.vertexNormals[i]= sphere.vertexNormals[i]/3;
-
-  // }
   createVaoObjects(programs[0], "Sphere", vertices = sphere.vertices, normals = sphere.vertexNormals, indices = sphere.indices);
   createVaoObjects(programs[0], "Cube", vertices = cube.vertices, normals = cube.vertexNormals, indices = cube.indices);
   createVaoObjects(programs[1], "Lines", lines_position);
@@ -260,9 +253,6 @@ function animate_pca() {
   }
 }
 
-function animate_kmeans() {
-
-}
 
 var updateScene = function () {
   stats.begin();
@@ -290,57 +280,26 @@ function drawScene() {
   if (pca && !kmeans) {
     animate_pca();
   }
-  else if ((kmeans && count_frames == FRAME_RATE_KMEANS) || (kmeans && init_kmeans)) {
+  else if ((kmeans && count_frames == FRAME_RATE_KMEANS)) {
     if (ObjKMeans.end) {
       kmeans = !kmeans;
     }
-    else {
-
-      //console.log("Centroid");
+  else {
       last_centroid = ObjKMeans.centroids;
-
-      //centroids = new Item([last_centroid])
       new_values = ObjKMeans.performSteps();
-      //console.log("New Value");
-      //console.log(new_values.centroids);
-
-      //calcola qui il punto di controllo per ogni centroid in maniera random 
-      new_values.centroids.forEach((element, index) => {
-        var sign = Math.floor(Math.random() * 2) == 1 ? 1 : -1;
-        centroid_control_points[index] = [(element[0] + last_centroid[index][0]) / 2 + sign * Math.random(), (element[1] + last_centroid[index][1]) / 2 + sign * Math.random(), (element[2] + 0) + sign * Math.random()];
-      });
-
-
       count_frames = 0;
-      init_kmeans = false;
     }
-  } else if (kmeans && !(count_frames == FRAME_RATE_KMEANS)) {
-    count_frames += 1;
-    if (count_frames == FRAME_RATE_KMEANS) init_kmeans = true;
-
-    // per ogni centroid (1,2,3) animalo e muovilo... 
-    // setta le properita di luce e disegna il modello
-
-    // per ogni centroid calcola il nuovo punto tipo cosi
-    new_values.centroids.forEach((element, index) => {
-      anim_points[index] = bezier.quadraticBezier([last_centroid[index][0], last_centroid[index][1], last_centroid[index][2]], [centroid_control_points[index][0],centroid_control_points[index][1],centroid_control_points[index][2]], [element[0], element[1], 0.0], count_frames / FRAME_RATE_KMEANS);
-      console.log(centroid_items[index]);
-      centroid_items[index].set_pos(utils.MakeWorld(anim_points[index].x * MULTIPLICATIVE_FACTOR, anim_points[index].y * MULTIPLICATIVE_FACTOR, anim_points[index].z* MULTIPLICATIVE_FACTOR, centroid_items[index].rotX, centroid_items[index].rotY, centroid_items[index].rotZ, RADIUS));
-      centroid_items[index].set_x(anim_points[index].x);
-      centroid_items[index].set_y(anim_points[index].y);
-      centroid_items[index].set_z(anim_points[index].z);
-    
-    });
-
-    
-    
-
-
-    //console.log(point);
-
-    //render
-
-
+  } 
+  else if (kmeans && !(count_frames == FRAME_RATE_KMEANS)) {
+  count_frames += 1;
+  new_values.centroids.forEach((element, index) => {
+    anim_points[index] = bezier.linear([last_centroid[index][0], last_centroid[index][1], last_centroid[index][2]], [element[0], element[1], element[2]], count_frames / FRAME_RATE_KMEANS);
+    centroid_items[index].set_pos(utils.MakeWorld(anim_points[index].x * MULTIPLICATIVE_FACTOR, anim_points[index].y * MULTIPLICATIVE_FACTOR, anim_points[index].z* MULTIPLICATIVE_FACTOR, centroid_items[index].rotX, centroid_items[index].rotY, centroid_items[index].rotZ, RADIUS));
+    centroid_items[index].set_x(anim_points[index].x);
+    centroid_items[index].set_y(anim_points[index].y);
+    centroid_items[index].set_z(anim_points[index].z);
+  
+  });
 
 
   }
@@ -352,7 +311,7 @@ function drawScene() {
   showAxes();
   gl.useProgram(programs[0]);
 
-
+  if(new_values!==undefined){
   for (let i = 0; i < centroids.length; i++) {
     
     var shape = listOfPossibleModels[1];
@@ -365,7 +324,6 @@ function drawScene() {
     var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
     var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
     var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
-
     gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
 
     var colorCentroid = [0.8, 0.7, 0.0];
@@ -393,6 +351,8 @@ function drawScene() {
     gl.bindVertexArray(vao[shape]); // va bene metterlo qui prima di diseganre
     gl.drawElements(gl.TRIANGLES, models[shape].indices.length, gl.UNSIGNED_SHORT, 0);
   }
+}
+
 
   for (i = 0; i < dataset.length; i++) {
 
@@ -545,8 +505,6 @@ function createUiModelClass() {
 
 }
 
-
-
 function showAxes() {
   gl.useProgram(programs[1]);
   var worldMatrix = utils.MakeWorld(0, 0, 0, 0, 0, 0, SCALE_FACTOR);
@@ -662,6 +620,13 @@ function updatePalette(event) {
 
 
 var bezier = {
+  linear:(p0,p1,t) => {
+    var pFinal={};
+    pFinal.x=(1-t)*p0[0]+t*p1[0];
+    pFinal.y=(1-t)*p0[1]+t*p1[1];
+    pFinal.z=(1-t)*p0[2]+t*p1[2];
+    return pFinal;
+  },
   quadraticBezier: (p0, p1, p2, t) => {
     var pFinal = {};
     pFinal.x = Math.pow(1 - t, 2) * p0[0] + (1 - t) * 2 * t * p1[0] + Math.pow(t, 2) * p2[0];

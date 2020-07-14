@@ -177,7 +177,6 @@ var callbacks={
                   });
                   ObjKMeans=new KMeans(dataset_kMeans,centroids,rate_k_means,DISTANCE_KMEANS[0]);
                   $("#distance_selection").prop('disabled', true);
-                  count_frames=0;
                   last_centroid=centroids;
                 }
                 }
