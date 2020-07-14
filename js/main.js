@@ -47,7 +47,7 @@
     items[index] = new Item([dataset[index].x, dataset[index].y, dataset[index].z], dataset[index].class);
   });
 
-  
+
   // centroids for k-means
   await utils.get_json(baseDir + "/model/centroids.json", function (jsonFile) {
     centroids = jsonFile.data;
@@ -277,6 +277,8 @@ function resize(canvas) {
 }
 
 function drawScene() {
+  var min = +Infinity;
+  var max = 0;
   if (pca && !kmeans) {
     animate_pca();
   }
@@ -284,22 +286,33 @@ function drawScene() {
     if (ObjKMeans.end) {
       kmeans = !kmeans;
     }
-  else {
+    else {
       last_centroid = ObjKMeans.centroids;
       new_values = ObjKMeans.performSteps();
+      
       count_frames = 0;
     }
-  } 
+  }
   else if (kmeans && !(count_frames == FRAME_RATE_KMEANS)) {
-  count_frames += 1;
-  new_values.centroids.forEach((element, index) => {
-    anim_points[index] = bezier.linear([last_centroid[index][0], last_centroid[index][1], last_centroid[index][2]], [element[0], element[1], element[2]], count_frames / FRAME_RATE_KMEANS);
-    centroid_items[index].set_pos(utils.MakeWorld(anim_points[index].x * MULTIPLICATIVE_FACTOR, anim_points[index].y * MULTIPLICATIVE_FACTOR, anim_points[index].z* MULTIPLICATIVE_FACTOR, centroid_items[index].rotX, centroid_items[index].rotY, centroid_items[index].rotZ, RADIUS));
-    centroid_items[index].set_x(anim_points[index].x);
-    centroid_items[index].set_y(anim_points[index].y);
-    centroid_items[index].set_z(anim_points[index].z);
-  
-  });
+    count_frames += 1;
+    new_values.centroids.forEach((element, index) => {
+      anim_points[index] = bezier.linear([last_centroid[index][0], last_centroid[index][1], last_centroid[index][2]], [element[0], element[1], element[2]], count_frames / FRAME_RATE_KMEANS);
+      centroid_items[index].set_pos(utils.MakeWorld(anim_points[index].x * MULTIPLICATIVE_FACTOR, anim_points[index].y * MULTIPLICATIVE_FACTOR, anim_points[index].z * MULTIPLICATIVE_FACTOR, centroid_items[index].rotX, centroid_items[index].rotY, centroid_items[index].rotZ, RADIUS));
+      centroid_items[index].set_x(anim_points[index].x);
+      centroid_items[index].set_y(anim_points[index].y);
+      centroid_items[index].set_z(anim_points[index].z);
+      
+      
+      var distance;
+
+      for (let i = 0; i < dataset.length; i++) {
+
+        distance = util_distances.euclidean(anim_points[index],[items[i].x, items[i].y, items[i].z]);
+        min = Math.min(distance, min);
+        max = Math.max(distance,max);
+      }
+
+    });
 
 
   }
@@ -311,101 +324,172 @@ function drawScene() {
   showAxes();
   gl.useProgram(programs[0]);
 
-  if(new_values!==undefined){
-  for (let i = 0; i < centroids.length; i++) {
+  if (new_values !== undefined) {
     
-    var shape = listOfPossibleModels[1];
-    var worldMatrix = centroid_items[i].worldM;
+    for (let i = 0; i < centroids.length; i++) {
+      
+      var shape = listOfPossibleModels[1];
+      var worldMatrix = centroid_items[i].worldM;
 
-    var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
-    var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
-    var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [cx, cy, cz, 1.0]);
-    var lightPosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [dirLightPos_x, dirLightPos_y, dirLightPos_z, 1.0]);
-    var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
-    var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
-    var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
-    gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
+      var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
+      var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
+      var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [cx, cy, cz, 1.0]);
+      var lightPosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [dirLightPos_x, dirLightPos_y, dirLightPos_z, 1.0]);
+      var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
+      var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
+      var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
+      gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
 
-    var colorCentroid = [0.8, 0.7, 0.0];
-    gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
-    gl.uniform3fv(programs[0].materialDiffColorHandle, colorCentroid);
-    gl.uniform3fv(programs[0].lightColorHandle, directionalLightColor);
-    gl.uniform3fv(programs[0].lightDirectionHandle, directionalLightTrasformed);
-    gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
-    gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
-    gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
-    gl.uniform1f(programs[0].lightConeOutHandle, lightConeOut);
-    gl.uniform1f(programs[0].lightConeInHandle, lightConeIn);
-    gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
-    gl.uniform3fv(programs[0].AmbientLightColHandle, ambientLightColor);
-    gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
-    gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
-    gl.uniform3fv(programs[0].AmbientMatColHandle, colorCentroid);
-    gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
-    gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
-    gl.uniform4fv(programs[0].specularTypehandle, specularType);
-    gl.uniform1f(programs[0].specShineHandle, SpecShine);
-    gl.uniform3fv(programs[0].specularColorHandle, specularColor);
-    gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
+      var colorCentroid = centroid_colors[i];
+      gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
+      gl.uniform3fv(programs[0].materialDiffColorHandle, colorCentroid);
+      gl.uniform3fv(programs[0].lightColorHandle, directionalLightColor);
+      gl.uniform3fv(programs[0].lightDirectionHandle, directionalLightTrasformed);
+      gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
+      gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
+      gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
+      gl.uniform1f(programs[0].lightConeOutHandle, lightConeOut);
+      gl.uniform1f(programs[0].lightConeInHandle, lightConeIn);
+      gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
+      gl.uniform3fv(programs[0].AmbientLightColHandle, ambientLightColor);
+      gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
+      gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
+      gl.uniform3fv(programs[0].AmbientMatColHandle, colorCentroid);
+      gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
+      gl.uniform3fv(programs[0].MatEmisColHandle, colorCentroid);
+      gl.uniform4fv(programs[0].specularTypehandle, specularType);
+      gl.uniform1f(programs[0].specShineHandle, SpecShine);
+      gl.uniform3fv(programs[0].specularColorHandle, specularColor);
+      gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
 
-    gl.bindVertexArray(vao[shape]); // va bene metterlo qui prima di diseganre
-    gl.drawElements(gl.TRIANGLES, models[shape].indices.length, gl.UNSIGNED_SHORT, 0);
-  }
-}
+      gl.bindVertexArray(vao[shape]); // va bene metterlo qui prima di diseganre
+      gl.drawElements(gl.TRIANGLES, models[shape].indices.length, gl.UNSIGNED_SHORT, 0);
+    }
+    for (i = 0; i < dataset.length; i++) {
+      
+      if (dataset[i].x < (min_x + (x_range.valueLow * (max_x - min_x) / 100)) || dataset[i].x > (max_x - (1 - x_range.valueHigh / 100) * (max_x - min_x)) ||
+        dataset[i].y < (min_y + (y_range.valueLow * (max_y - min_y) / 100)) || dataset[i].y > (max_y - (1 - y_range.valueHigh / 100) * (max_y - min_y)) ||
+        dataset[i].z < (min_z + (z_range.valueLow * (max_z - min_z) / 100)) || dataset[i].z > (max_z - (1 - z_range.valueHigh / 100) * (max_z - min_z))) {
+        items[i].set_display(false);
+        continue;
+      }
 
 
-  for (i = 0; i < dataset.length; i++) {
 
-    if (dataset[i].x < (min_x + (x_range.valueLow * (max_x - min_x) / 100)) || dataset[i].x > (max_x - (1 - x_range.valueHigh / 100) * (max_x - min_x)) ||
-      dataset[i].y < (min_y + (y_range.valueLow * (max_y - min_y) / 100)) || dataset[i].y > (max_y - (1 - y_range.valueHigh / 100) * (max_y - min_y)) ||
-      dataset[i].z < (min_z + (z_range.valueLow * (max_z - min_z) / 100)) || dataset[i].z > (max_z - (1 - z_range.valueHigh / 100) * (max_z - min_z))) {
-      items[i].set_display(false);
-      continue;
+
+      var objSelected = $('#class' + dataset[i].class).val();
+      var ele = listOfPossibleModels[objSelected];
+
+      var worldMatrix = items[i].worldM;
+      var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
+      var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
+      var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [cx, cy, cz, 1.0]);
+      var lightPosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [dirLightPos_x, dirLightPos_y, dirLightPos_z, 1.0]);
+      var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
+      var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
+      var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
+
+      gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
+      
+      
+      var cluster_color = centroid_colors[new_values.assignments[i]];
+      
+      
+      var distance_p_centroid = util_distances.euclidean([dataset[i].x,dataset[i].y,dataset[i].z], [anim_points[new_values.assignments[i]].x,anim_points[new_values.assignments[i]].y, anim_points[new_values.assignments[i]].z]);
+      console.log(distance_p_centroid);
+      var distance_norm = normalize(distance_p_centroid, min, max);
+      console.log(distance_norm);
+      var final_color = new Array();
+      for (let i = 0; i < cluster_color.length; i++) {
+        final_color[i] = cluster_color[i] * (1 - distance_norm);
+        }
+      
+      
+      var color = i == object_selected ? cubeMaterialColor : final_color;
+
+      gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
+      gl.uniform3fv(programs[0].materialDiffColorHandle, color);
+      gl.uniform3fv(programs[0].lightColorHandle, directionalLightColor);
+      gl.uniform3fv(programs[0].lightDirectionHandle, directionalLightTrasformed);
+      gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
+      gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
+      gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
+      gl.uniform1f(programs[0].lightConeOutHandle, lightConeOut);
+      gl.uniform1f(programs[0].lightConeInHandle, lightConeIn);
+      gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
+      gl.uniform3fv(programs[0].AmbientLightColHandle, ambientLightColor);
+      gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
+      gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
+      gl.uniform3fv(programs[0].AmbientMatColHandle, color);
+      gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
+      gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
+      gl.uniform4fv(programs[0].specularTypehandle, specularType);
+      gl.uniform1f(programs[0].specShineHandle, SpecShine);
+      gl.uniform3fv(programs[0].specularColorHandle, specularColor);
+      gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
+
+      gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
+      gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
     }
 
-
-
-
-    var objSelected = $('#class' + dataset[i].class).val();
-    var ele = listOfPossibleModels[objSelected];
-
-    var worldMatrix = items[i].worldM;
-    var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
-    var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
-    var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [cx, cy, cz, 1.0]);
-    var lightPosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [dirLightPos_x, dirLightPos_y, dirLightPos_z, 1.0]);
-    var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
-    var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
-    var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
-
-    gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
-
-    var color = i == object_selected ? cubeMaterialColor : colorDiffuseClass[dataset[i].class];
-
-    gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
-    gl.uniform3fv(programs[0].materialDiffColorHandle, color);
-    gl.uniform3fv(programs[0].lightColorHandle, directionalLightColor);
-    gl.uniform3fv(programs[0].lightDirectionHandle, directionalLightTrasformed);
-    gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
-    gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
-    gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
-    gl.uniform1f(programs[0].lightConeOutHandle, lightConeOut);
-    gl.uniform1f(programs[0].lightConeInHandle, lightConeIn);
-    gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
-    gl.uniform3fv(programs[0].AmbientLightColHandle, ambientLightColor);
-    gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
-    gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
-    gl.uniform3fv(programs[0].AmbientMatColHandle, color);
-    gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
-    gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
-    gl.uniform4fv(programs[0].specularTypehandle, specularType);
-    gl.uniform1f(programs[0].specShineHandle, SpecShine);
-    gl.uniform3fv(programs[0].specularColorHandle, specularColor);
-    gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-
-    gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
-    gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
   }
+
+  if (new_values == undefined) {
+    for (i = 0; i < dataset.length; i++) {
+
+      if (dataset[i].x < (min_x + (x_range.valueLow * (max_x - min_x) / 100)) || dataset[i].x > (max_x - (1 - x_range.valueHigh / 100) * (max_x - min_x)) ||
+        dataset[i].y < (min_y + (y_range.valueLow * (max_y - min_y) / 100)) || dataset[i].y > (max_y - (1 - y_range.valueHigh / 100) * (max_y - min_y)) ||
+        dataset[i].z < (min_z + (z_range.valueLow * (max_z - min_z) / 100)) || dataset[i].z > (max_z - (1 - z_range.valueHigh / 100) * (max_z - min_z))) {
+        items[i].set_display(false);
+        continue;
+      }
+
+
+
+
+      var objSelected = $('#class' + dataset[i].class).val();
+      var ele = listOfPossibleModels[objSelected];
+
+      var worldMatrix = items[i].worldM;
+      var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
+      var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
+      var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [cx, cy, cz, 1.0]);
+      var lightPosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [dirLightPos_x, dirLightPos_y, dirLightPos_z, 1.0]);
+      var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
+      var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
+      var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
+
+      gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
+
+      
+      var color = i == object_selected ? cubeMaterialColor : colorDiffuseClass[dataset[i].class];
+
+      gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
+      gl.uniform3fv(programs[0].materialDiffColorHandle, color);
+      gl.uniform3fv(programs[0].lightColorHandle, directionalLightColor);
+      gl.uniform3fv(programs[0].lightDirectionHandle, directionalLightTrasformed);
+      gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
+      gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
+      gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
+      gl.uniform1f(programs[0].lightConeOutHandle, lightConeOut);
+      gl.uniform1f(programs[0].lightConeInHandle, lightConeIn);
+      gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
+      gl.uniform3fv(programs[0].AmbientLightColHandle, ambientLightColor);
+      gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
+      gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
+      gl.uniform3fv(programs[0].AmbientMatColHandle, color);
+      gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
+      gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
+      gl.uniform4fv(programs[0].specularTypehandle, specularType);
+      gl.uniform1f(programs[0].specShineHandle, SpecShine);
+      gl.uniform3fv(programs[0].specularColorHandle, specularColor);
+      gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
+
+      gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
+      gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
+    }
+  }
+
 
 }
 
@@ -620,11 +704,11 @@ function updatePalette(event) {
 
 
 var bezier = {
-  linear:(p0,p1,t) => {
-    var pFinal={};
-    pFinal.x=(1-t)*p0[0]+t*p1[0];
-    pFinal.y=(1-t)*p0[1]+t*p1[1];
-    pFinal.z=(1-t)*p0[2]+t*p1[2];
+  linear: (p0, p1, t) => {
+    var pFinal = {};
+    pFinal.x = (1 - t) * p0[0] + t * p1[0];
+    pFinal.y = (1 - t) * p0[1] + t * p1[1];
+    pFinal.z = (1 - t) * p0[2] + t * p1[2];
     return pFinal;
   },
   quadraticBezier: (p0, p1, p2, t) => {
@@ -651,4 +735,17 @@ function initializeControlPoint() {
     control_quadratic_points[index] = [(element[0] + adjusted_data_x[index]) / 2 + sign * Math.random(), (element[1] + adjusted_data_y[index]) / 2 + sign * Math.random(), (element[2] + 0) + sign * Math.random()];
   })
 
+}
+
+function normalize(val, min, max){
+  // Shift to positive to avoid issues when crossing the 0 line
+  if(min < 0){
+    max += 0 - min;
+    val += 0 - min;
+    min = 0;
+  }
+  // Shift values from 0 - max
+  val = val - min;
+  max = max - min;
+  return Math.max(0, Math.min(1, val / max));
 }

@@ -61,6 +61,11 @@ var kmeans=false;
 var ObjKMeans;
 var rate_k_means="slow";
 var centroids;
+var centroid_colors={
+  0: [1.0,0.0,0.0],
+  1: [0.0,1.0,0.0],
+  2: [0.0,0.0,1.0]
+}
 var centroid_items=new Array();
 var dataset_kMeans=new Array();
 var anim_points=new Array();
