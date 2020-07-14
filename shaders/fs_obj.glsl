@@ -42,6 +42,10 @@ uniform float L1_ConeIn;
 uniform float L1_Decay;
 uniform float L1_Target;
 
+//Texture
+in vec2 fs_uv;
+uniform sampler2D u_texture;
+
 vec3 computeLightDir(vec3 lightPos, vec3 lightDir) {
 	
 	//Direct
@@ -135,7 +139,7 @@ void main() {
   vec3 lDir = computeLightDir(lightPos, L1_lightDirection);
   vec3 lColor = computeLightColor(lightPos);
   //diffuse
-  vec3 diffuseColor = mDiffColor * computeDiffuseLight(nNormal, lDir, eyedirVec) * lColor;
+  vec3 diffuseColor = vec3(texture(u_texture,fs_uv));//mDiffColor * computeDiffuseLight(nNormal, lDir, eyedirVec) * lColor;
   //ambient
   vec3 ambientColor = computeAmbientLight(nNormal) * ambientMatColor;
   //specular

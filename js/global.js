@@ -222,3 +222,4 @@ var z_range=document.getElementById('z_range');
 
 
 
+var texture=[];

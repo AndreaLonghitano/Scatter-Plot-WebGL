@@ -36,6 +36,26 @@
     classes = [...new Set(dataset.map(item => item.class))];
   });
 
+  imgtx = new Image();
+	imgtx.txNum = 0;
+	imgtx.onload = textureLoaderCallback;
+  imgtx.src = baseDir+"/model/texture_cube.png";
+  
+  imgtx = new Image();
+	imgtx.txNum = 1;
+	imgtx.onload = textureLoaderCallback;
+  imgtx.src = baseDir+"/model/texture_sphere.png";
+
+
+
+
+  
+
+
+  
+  
+  
+  
   items = new Array(dataset.length);
   dataset.forEach((element, index) => {
     min_x = Math.min(dataset[index].x, min_x)
@@ -65,13 +85,11 @@
 
   utils.showCanvas();
 
-  cubeObjStr = await utils.get_objstr(baseDir + "/model/cube_1.obj");
+  cubeObjStr = await utils.get_objstr(baseDir + "/model/cube.obj");
   cube = new OBJ.Mesh(cubeObjStr);
   sphereObjStr = await utils.get_objstr(baseDir + "/model/sphere_1.obj");
   sphere = new OBJ.Mesh(sphereObjStr);
   models = { 'Cube': cube, 'Sphere': sphere };
-
-
 
 
   gl.useProgram(programs[0]);
@@ -99,7 +117,9 @@
   programs[0].specularColorHandle = gl.getUniformLocation(programs[0], "specCol");
   programs[0].lightDirMatrixPositionHandle = gl.getUniformLocation(programs[0], 'lightDirMatrix');
   programs[0].eyePosHandler = gl.getUniformLocation(programs[0], "eyePos");
-
+  programs[0].uvAttributeLocation=gl.getAttribLocation(programs[0], "a_uv");  
+  programs[0].textLocation = gl.getUniformLocation(programs[0], "u_texture");
+ 
   gl.useProgram(programs[1]);
   programs[1].positionAttributeLocation = gl.getAttribLocation(programs[1], "inPosition");
   programs[1].matrixLocation = gl.getUniformLocation(programs[1], "matrix");
@@ -113,8 +133,8 @@
 
 
 
-  createVaoObjects(programs[0], "Sphere", vertices = sphere.vertices, normals = sphere.vertexNormals, indices = sphere.indices);
-  createVaoObjects(programs[0], "Cube", vertices = cube.vertices, normals = cube.vertexNormals, indices = cube.indices);
+  createVaoObjects(programs[0], "Sphere", vertices = sphere.vertices, normals = sphere.vertexNormals, indices = sphere.indices,uv=sphere.textures);
+  createVaoObjects(programs[0], "Cube", vertices = cube.vertices, normals = cube.vertexNormals, indices = cube.indices,uv=cube.textures);
   createVaoObjects(programs[1], "Lines", lines_position);
   pyramid = buildPyramid();
   createVaoObjects(programs[1], "Pyramid", vertices = pyramid.vertices, normals = undefined, indices = pyramid.indices);
@@ -126,7 +146,9 @@
 
 }(window))
 
-function createVaoObjects(program, nameObject, vertices, normals = undefined, indices = undefined) {
+
+
+function createVaoObjects(program, nameObject, vertices, normals = undefined, indices = undefined,uv = undefined) {
   gl.useProgram(program);
   vao[nameObject] = gl.createVertexArray();
   gl.bindVertexArray(vao[nameObject]);
@@ -154,6 +176,14 @@ function createVaoObjects(program, nameObject, vertices, normals = undefined, in
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
   }
+  if(!(uv== undefined)){
+    var uvBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uv), gl.STATIC_DRAW); // the uv coordinates are in the cubeDefintion files
+    gl.enableVertexAttribArray(programs[0].uvAttributeLocation);
+    gl.vertexAttribPointer(programs[0].uvAttributeLocation, 2, gl.FLOAT, false, 0, 0); // 2 values for each coordinate...
+  }
+
   gl.bindVertexArray(null);
 }
 
@@ -321,6 +351,9 @@ function drawScene() {
   resize(gl.canvas);
   gl.clearColor(0.85, 0.85, 0.85, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
+  gl.enable(gl.CULL_FACE);
+  gl.enable(gl.POLYGON_OFFSET_FILL);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   computeViewMatrix();
   showAxes();
@@ -367,7 +400,7 @@ function drawScene() {
       gl.bindVertexArray(vao[shape]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[shape].indices.length, gl.UNSIGNED_SHORT, 0);
     }
-    console.log("DAHDAHHAD");
+    
     for (var i = 0; i < dataset.length && anim_points.length; i++) {
 
       var objSelected = $('#class' + dataset[i].class).val();
@@ -725,4 +758,17 @@ function initializeControlPoint() {
 
 function normalize(val, min, max){
   return (val - min) / (max - min); 
+}
+
+// texture loader callback
+var textureLoaderCallback = function() {
+	var textureId = gl.createTexture();
+	gl.activeTexture(gl.TEXTURE0 + this.txNum);
+	gl.bindTexture(gl.TEXTURE_2D, textureId);		
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this);		
+// set the filtering so we don't need mips
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
 }
