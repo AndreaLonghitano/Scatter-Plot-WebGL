@@ -132,18 +132,53 @@
       </div>
     </div>
     <br/>
-
-    <div class="row">
-      <div class="col-4">
-        <label for="customRange2">Velocity</label>
-      </div>
-    </div>
     <hr />
     <div class="row">
       <div id="model-class">
       </div>
     </div>
     <hr />
+
+    <div class="row d-flex justify-content-center">
+      <div class="col-3 offset-1 justify-content-center">
+        <label for="class">Light</label>
+      </div>
+
+      <div class="col-7 offset-1 justify-content-center">
+        <select class="mdb-select md-form" style="background-color: azure;" id="light-type-select"
+          onchange="lightTypeSelection()">
+          <option value="0">Direct</option>
+          <option value="1">Point</option>
+          <option value="2">Spot</option>
+        </select>
+      </div>
+    </div>
+
+      <div class="row d-flex justify-content-center">
+      <div id="direct" style="display:block;">
+        &theta; <input type="range" class="custom-range" min="0" max="180" step="1" value ="90" id="alfa_light"><br />
+        &phi; <input type="range" class="custom-range" min="-180" max="180" step="1" value ="0" id="beta_light">
+      </div>
+    </div>
+    <div class="row d-flex justify-content-center">
+      <div id="point" style="display:none;">
+        pos x <input type="range" class="custom-range" min="-250" max="250" step="1" id="x_light"><br />
+        pos y <input type="range" class="custom-range" min="-250" max="250" step="1" id="y_light"><br />
+        pos z <input type="range" class="custom-range" min="-250" max="250" step="1" id="z_light">
+      </div>
+    </div>
+    <div class="row d-flex justify-content-center">
+        <div id="cone" style="display:none;">
+          ConeOut <input type="range" class="custom-range" min="0" max="150" id="cone_out"><br />
+          ConeIn <input type="range" class="custom-range" min="0" max="100" id="cone_in">
+        </div>
+      </div>
+
+
+
+
+
+    <!--
     <section class="demo">
       <div class='col-4'>
         <div class="row d-flex justify-content-center">
@@ -170,26 +205,43 @@
             ConeOut <input type="range" class="custom-range" min="0" max="150" id="cone_out"><br />
             ConeIn <input type="range" class="custom-range" min="0" max="100" id="cone_in"></div>
     </section>
+    -->
     <hr>
 
-    <section class="demo">
-      <div class='col-4'>
-        <div class="row d-flex justify-content-center">
-          <div class="col-3 offset-1 justify-content-center">
-            <label for="class">Diffuse</label>
-          </div>
-          <div class="col-7 offset-1 justify-content-center">
-            <select class="mdb-select md-form" style="background-color: azure;" id="diffuse-type-select"
-              onchange="diffuseTypeSelection()">
-              <option value="0">Lambert</option>
-              <option value="1">Oren-Nayar</option>
-            </select>
-          </div>
-        </div>
-
-    </section>
+    <div class="row d-flex justify-content-center">
+      <div class="col-3 offset-1 justify-content-center">
+      <label for="class">Diffuse</label>
+      </div>
+      <div class="col-7 offset-1 justify-content-center">
+        <select class="mdb-select md-form" style="background-color: azure;" id="diffuse-type-select"
+          onchange="diffuseTypeSelection()">
+          <option value="0">Lambert</option>
+          <option value="1">Oren-Nayar</option>
+        </select>
+      </div>
+    </div>
     <hr />
 
+    <!-- bootstrap corretto-->
+    <div class="row d-flex justify-content-center">
+      <div class="col-3 offset-1 justify-content-center">
+        <label for="class">Ambient</label>
+      </div>
+
+      <div class="col-7 offset-1 justify-content-center">
+        <select class="mdb-select md-form" style="background-color: azure;" id="ambient-type-select"
+          onchange="ambientTypeSelection()">
+          <option value="0">None</option>
+          <option value="1" selected>Ambient</option>
+          <option value="2">Hemispheric</option>
+        </select>
+      </div>
+      <div class="row" id="hemispheric-dir" style="display:none">
+        &theta; <input type="range" class="custom-range" min="0" max="180" step="1" value="90" id="alfa_ambient"><br /> <br />
+        &phi; <input type="range" class="custom-range" min="-180" max="180" step="1" value ="0" id="beta_ambient"></div>
+      </div>
+  
+      <!--
     <section class="demo">
       <div class='col-4'>
         <div class="row d-flex justify-content-center">
@@ -209,8 +261,31 @@
           &theta; <input type="range" class="custom-range" min="0" max="180" step="1" value="90" id="alfa_ambient"><br /> <br />
           &phi; <input type="range" class="custom-range" min="-180" max="180" step="1" value ="0" id="beta_ambient"></div>
 </section>
+-->
 <hr>
-<section class="demo">
+<div class="row d-flex justify-content-center">
+  <div class="col-3 offset-1 justify-content-center">
+    <label for="class">Specular</label>
+  </div>
+  <div class="col-7 offset-1 justify-content-center">
+    <select class="mdb-select md-form" style="background-color: azure;" id="specular-type-select"
+      onchange="specularTypeSelection()">
+      <option value="0" selected>None</option>
+      <option value="1">Blinn</option>
+      <option value="2">Phong</option>
+    </select>
+  </div>
+
+  <div class="row" id="spec-shine-div" style="display:none;">
+    SpecShine <input type="range" class="custom-range" min="1" max="200"id="spec_shine">
+  </div>
+</div>
+
+
+
+
+<!--
+</div><section class="demo">
   <div class='col-4'>
     <div class="row d-flex justify-content-center">
       <div class="col-3 offset-1 justify-content-center">
@@ -228,7 +303,7 @@
     <div id="spec-shine-div" style="display:none;">
       SpecShine <input type="range" class="custom-range" min="1" max="200"id="spec_shine"></div>
 </section>
-
+-->
     <div class="row">
       <div id="model-class">
       </div>
