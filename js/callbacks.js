@@ -266,8 +266,7 @@ $("#beta_ambient").on('input change',function(){
   ambientLightDir = [Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p)];
 });
 
-
-
-
-
+$("#texactive").click(()=>{
+  texture_mix= 1 - texture_mix;
+});
 

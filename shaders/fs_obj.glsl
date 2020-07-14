@@ -45,6 +45,7 @@ uniform float L1_Target;
 //Texture
 in vec2 fs_uv;
 uniform sampler2D u_texture;
+uniform float texture_mix;
 
 vec3 computeLightDir(vec3 lightPos, vec3 lightDir) {
 	
@@ -139,12 +140,14 @@ void main() {
   vec3 lDir = computeLightDir(lightPos, L1_lightDirection);
   vec3 lColor = computeLightColor(lightPos);
   //diffuse
-  vec3 diffuseColor = vec3(texture(u_texture,fs_uv));//mDiffColor * computeDiffuseLight(nNormal, lDir, eyedirVec) * lColor;
+  vec3 diffuseColor = vec3(texture(u_texture,fs_uv))*(texture_mix) + (1.0-texture_mix)*(mDiffColor * computeDiffuseLight(nNormal, lDir, eyedirVec) * lColor);
   //ambient
-  vec3 ambientColor = computeAmbientLight(nNormal) * ambientMatColor;
+  vec3 ambientMatColorMix = vec3(texture(u_texture,fs_uv))*(texture_mix) + (1.0 - texture_mix) * ambientMatColor;
+  vec3 ambientColor = computeAmbientLight(nNormal) * ambientMatColorMix;
   //specular
   vec3 specular = computeSpecularLight(eyedirVec, lDir, nNormal, lColor);
   vec3 specularColor = specular * specCol;
+  
   //Final Color
   outColor = vec4(clamp(ambientColor + diffuseColor + emitColor + specularColor, 0.0, 1.0), 1.0);
   }

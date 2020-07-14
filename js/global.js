@@ -223,3 +223,4 @@ var z_range=document.getElementById('z_range');
 
 
 var texture=[];
+var texture_mix=1;

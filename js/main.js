@@ -85,7 +85,7 @@
 
   utils.showCanvas();
 
-  cubeObjStr = await utils.get_objstr(baseDir + "/model/cube.obj");
+  cubeObjStr = await utils.get_objstr(baseDir + "/model/cube_1.obj");
   cube = new OBJ.Mesh(cubeObjStr);
   sphereObjStr = await utils.get_objstr(baseDir + "/model/sphere_1.obj");
   sphere = new OBJ.Mesh(sphereObjStr);
@@ -119,6 +119,7 @@
   programs[0].eyePosHandler = gl.getUniformLocation(programs[0], "eyePos");
   programs[0].uvAttributeLocation=gl.getAttribLocation(programs[0], "a_uv");  
   programs[0].textLocation = gl.getUniformLocation(programs[0], "u_texture");
+  programs[0].textureMixHandle = gl.getUniformLocation(programs[0], "texture_mix");
  
   gl.useProgram(programs[1]);
   programs[1].positionAttributeLocation = gl.getAttribLocation(programs[1], "inPosition");
@@ -445,6 +446,7 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
+      gl.uniform1f(programs[0].textureMixHandle, texture_mix*0.5);
 
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
@@ -503,6 +505,7 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
+      gl.uniform1f(programs[0].textureMixHandle, texture_mix*0.5);
 
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
