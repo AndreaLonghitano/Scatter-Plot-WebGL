@@ -75,6 +75,8 @@ var init_kmeans = true;
 var centroid_control_points = [];
 var last_centroid=new Array();
 var new_values;
+var min = [];
+var max= [];
 
 
 

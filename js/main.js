@@ -57,6 +57,10 @@
   centroids.forEach((element, index) => {
     centroid_items[index] = new Item([element[0], element[1], element[2]], "centroid");
   });
+  min=new Array(3);
+  max=new Array(3);
+  min.fill(+Infinity);
+  max.fill(0);
 
 
   utils.showCanvas();
@@ -276,9 +280,9 @@ function resize(canvas) {
   }
 }
 
+
 function drawScene() {
-  var min = +Infinity;
-  var max = 0;
+
   if (pca && !kmeans) {
     animate_pca();
   }
@@ -301,19 +305,17 @@ function drawScene() {
       centroid_items[index].set_x(anim_points[index].x);
       centroid_items[index].set_y(anim_points[index].y);
       centroid_items[index].set_z(anim_points[index].z);
-      
-      
-      var distance;
-
-      for (let i = 0; i < dataset.length; i++) {
-
-        distance = util_distances.euclidean(anim_points[index],[items[i].x, items[i].y, items[i].z]);
-        min = Math.min(distance, min);
-        max = Math.max(distance,max);
-      }
-
     });
-
+    for (var i=0;i<centroids.length;i++){
+      var el=[];
+      new_values.assignments.forEach((element,index)=>{
+        if (element==i) el.push(index);
+      });
+      el.forEach((e)=>{
+        min[i]=Math.min(util_distances.euclidean([dataset[e].x,dataset[e].y,dataset[e].z],[anim_points[i].x,anim_points[i].y,anim_points[i].z]),min[i]);
+        max[i]=Math.max(util_distances.euclidean([dataset[e].x,dataset[e].y,dataset[e].z],[anim_points[i].x,anim_points[i].y,anim_points[i].z]),max[i]);
+      })
+    }
 
   }
   resize(gl.canvas);
@@ -326,6 +328,7 @@ function drawScene() {
 
   if (new_values !== undefined) {
     
+    // render centroids
     for (let i = 0; i < centroids.length; i++) {
       
       var shape = listOfPossibleModels[1];
@@ -361,21 +364,11 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-
       gl.bindVertexArray(vao[shape]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[shape].indices.length, gl.UNSIGNED_SHORT, 0);
     }
-    for (i = 0; i < dataset.length; i++) {
-      
-      if (dataset[i].x < (min_x + (x_range.valueLow * (max_x - min_x) / 100)) || dataset[i].x > (max_x - (1 - x_range.valueHigh / 100) * (max_x - min_x)) ||
-        dataset[i].y < (min_y + (y_range.valueLow * (max_y - min_y) / 100)) || dataset[i].y > (max_y - (1 - y_range.valueHigh / 100) * (max_y - min_y)) ||
-        dataset[i].z < (min_z + (z_range.valueLow * (max_z - min_z) / 100)) || dataset[i].z > (max_z - (1 - z_range.valueHigh / 100) * (max_z - min_z))) {
-        items[i].set_display(false);
-        continue;
-      }
-
-
-
+    console.log("DAHDAHHAD");
+    for (var i = 0; i < dataset.length && anim_points.length; i++) {
 
       var objSelected = $('#class' + dataset[i].class).val();
       var ele = listOfPossibleModels[objSelected];
@@ -388,23 +381,15 @@ function drawScene() {
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
       var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
       var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
-
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
-      
-      
       var cluster_color = centroid_colors[new_values.assignments[i]];
-      
-      
       var distance_p_centroid = util_distances.euclidean([dataset[i].x,dataset[i].y,dataset[i].z], [anim_points[new_values.assignments[i]].x,anim_points[new_values.assignments[i]].y, anim_points[new_values.assignments[i]].z]);
-      console.log(distance_p_centroid);
-      var distance_norm = normalize(distance_p_centroid, min, max);
-      console.log(distance_norm);
+      var distance_norm = normalize(distance_p_centroid, min[new_values.assignments[i]], max[new_values.assignments[i]]);
       var final_color = new Array();
       for (let i = 0; i < cluster_color.length; i++) {
         final_color[i] = cluster_color[i] * (1 - distance_norm);
         }
-      
-      
+      if(i==0){console.log(final_color);}
       var color = i == object_selected ? cubeMaterialColor : final_color;
 
       gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
@@ -430,11 +415,12 @@ function drawScene() {
 
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
-    }
+    } 
+  
 
   }
 
-  if (new_values == undefined) {
+  else{
     for (i = 0; i < dataset.length; i++) {
 
       if (dataset[i].x < (min_x + (x_range.valueLow * (max_x - min_x) / 100)) || dataset[i].x > (max_x - (1 - x_range.valueHigh / 100) * (max_x - min_x)) ||
@@ -738,14 +724,5 @@ function initializeControlPoint() {
 }
 
 function normalize(val, min, max){
-  // Shift to positive to avoid issues when crossing the 0 line
-  if(min < 0){
-    max += 0 - min;
-    val += 0 - min;
-    min = 0;
-  }
-  // Shift values from 0 - max
-  val = val - min;
-  max = max - min;
-  return Math.max(0, Math.min(1, val / max));
+  return (val - min) / (max - min); 
 }
