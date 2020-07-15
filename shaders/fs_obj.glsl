@@ -124,7 +124,7 @@ vec3 computeSpecularLight(vec3 eyeDir, vec3 lightDir, vec3 normalVector, vec3 li
   vec3 blinnSpecular = vec3(pow(clamp(dot(normalize(eyeDir+lightDir), normalVector),0.0,1.0), SpecShine)) * lightColor;
 
   //Phong
-  vec3 reflection = -reflect(normalVector, lightDir); // dovrebbe essere light dir e normalVector
+  vec3 reflection = reflect(-lightDir, normalVector); // dovrebbe essere light dir e normalVector
   vec3 phongSpecular = vec3(pow(clamp(dot(eyeDir,reflection),0.0,1.0), SpecShine)) * lightColor;
 
   return blinnSpecular * specularType.x + phongSpecular*specularType.y ;
