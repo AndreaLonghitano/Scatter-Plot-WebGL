@@ -85,7 +85,7 @@
 
   utils.showCanvas();
 
-  cubeObjStr = await utils.get_objstr(baseDir + "/model/cube_1.obj");
+  cubeObjStr = await utils.get_objstr(baseDir + "/model/cube_test.obj");
   cube = new OBJ.Mesh(cubeObjStr);
   sphereObjStr = await utils.get_objstr(baseDir + "/model/sphere_1.obj");
   sphere = new OBJ.Mesh(sphereObjStr);
