@@ -124,7 +124,7 @@ vec3 computeSpecularLight(vec3 eyeDir, vec3 lightDir, vec3 normalVector, vec3 li
   vec3 blinnSpecular = vec3(pow(clamp(dot(normalize(eyeDir+lightDir), normalVector),0.0,1.0), SpecShine)) * lightColor;
 
   //Phong
-  vec3 reflection = reflect(-lightDir, normalVector); // dovrebbe essere light dir e normalVector
+  vec3 reflection = -reflect(lightDir, normalVector); // FIX!!
   vec3 phongSpecular = vec3(pow(clamp(dot(eyeDir,reflection),0.0,1.0), SpecShine)) * lightColor;
 
   return blinnSpecular * specularType.x + phongSpecular*specularType.y ;
@@ -135,19 +135,20 @@ void main() {
   vec3 nNormal = normalize(fsNormal); /* normalizza sempre perche è bene farlo */
   vec3 eyedirVec = normalize(eyePos.xyz - fsPosition);
   vec3 lightPos = L1_Pos.xyz;
-
+  vec3 texColor = vec3(texture(u_texture,fs_uv));
   //direct light
   vec3 lDir = computeLightDir(lightPos, L1_lightDirection);
   vec3 lColor = computeLightColor(lightPos);
   //diffuse
-  vec3 diffuseColor = vec3(texture(u_texture,fs_uv))*(texture_mix) + (1.0-texture_mix)*(mDiffColor * computeDiffuseLight(nNormal, lDir, eyedirVec) * lColor);
+  vec3 diffuseColor = texColor * texture_mix + (1.0 - texture_mix)*mDiffColor;
+  vec3 diffuse = computeDiffuseLight(nNormal,lDir,eyedirVec)*diffuseColor*lColor;
   //ambient
-  vec3 ambientMatColorMix = vec3(texture(u_texture,fs_uv))*(texture_mix) + (1.0 - texture_mix) * ambientMatColor;
-  vec3 ambientColor = computeAmbientLight(nNormal) * ambientMatColorMix;
+  vec3 ambientMatColorMix = texColor * texture_mix + (1.0 - texture_mix)* ambientMatColor;
+  vec3 ambient = computeAmbientLight(nNormal) * ambientMatColorMix;
   //specular
   vec3 specular = computeSpecularLight(eyedirVec, lDir, nNormal, lColor);
   vec3 specularColor = specular * specCol;
   
   //Final Color
-  outColor = vec4(clamp(ambientColor + diffuseColor + emitColor + specularColor, 0.0, 1.0), 1.0);
+  outColor = vec4(clamp(diffuse + ambient + emitColor + specularColor, 0.0, 1.0), 1.0);
   }

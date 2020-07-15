@@ -115,8 +115,8 @@ var cubeNormalMatrix;
 var cubeWorldMatrix = new Array();    //One world matric for each cube...
 
 //define directional light
-var dirLightAlpha = -utils.degToRad(90);
-var dirLightBeta  = -utils.degToRad(0);
+var dirLightAlpha = -utils.degToRad(document.getElementById("alfa_light").value);
+var dirLightBeta  = -utils.degToRad(document.getElementById("beta_light").value);
 
 var directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
             Math.sin(dirLightAlpha),
@@ -141,7 +141,7 @@ var dirLightType = dirLightTypeDict[0];
 
 //Ambient Light
 var ambientLightColor = [0.33, 0.33, 0.33]; // modify this for the "shadows"
-var ambientLightLowColor = [0.0, 0.13, 0.0];
+var ambientLightLowColor = [0.25, 0.25, 0.25];
 var ambientTypeDict = {
     0: [0,0,0,0], //none
 		1: [1,0,0,0], //ambient

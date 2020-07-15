@@ -89,7 +89,9 @@
   cube = new OBJ.Mesh(cubeObjStr);
   sphereObjStr = await utils.get_objstr(baseDir + "/model/sphere_1.obj");
   sphere = new OBJ.Mesh(sphereObjStr);
-  models = { 'Cube': cube, 'Sphere': sphere };
+  diamondObjStr = await utils.get_objstr(baseDir + "/model/diamond.obj");
+  diamond = new OBJ.Mesh(diamondObjStr);
+  models = { 'Cube': cube, 'Sphere': sphere};
 
 
   gl.useProgram(programs[0]);
@@ -136,6 +138,7 @@
 
   createVaoObjects(programs[0], "Sphere", vertices = sphere.vertices, normals = sphere.vertexNormals, indices = sphere.indices,uv=sphere.textures);
   createVaoObjects(programs[0], "Cube", vertices = cube.vertices, normals = cube.vertexNormals, indices = cube.indices,uv=cube.textures);
+  //createVaoObjects(programs[0], "Diamond", vertices = diamond.vertices, normals = diamond.vertexNormals, indices = diamond.indices,uv=diamond.textures);
   createVaoObjects(programs[1], "Lines", lines_position);
   pyramid = buildPyramid();
   createVaoObjects(programs[1], "Pyramid", vertices = pyramid.vertices, normals = undefined, indices = pyramid.indices);
