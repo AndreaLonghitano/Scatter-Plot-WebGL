@@ -140,7 +140,7 @@ var dirLightTypeDict = {
 var dirLightType = dirLightTypeDict[0];
 
 //Ambient Light
-var ambientLightColor = [0.33, 0.33, 0.33]; // modify this for the "shadows"
+var ambientLightColor = [0.16,0.22,0.25];//[0.33, 0.33, 0.33]; // modify this for the "shadows"
 var ambientLightLowColor = [0.25, 0.25, 0.25];
 var ambientTypeDict = {
     0: [0,0,0,0], //none
@@ -226,10 +226,10 @@ var texture=[];
 var texture_mix=1;
 
 const textureCubemapSrc = [
-  [baseDir+'texture/cubemap-sky/positive-x.jpg', 512, 'TEXTURE_CUBE_MAP_POSITIVE_X'],
-  [baseDir+'texture/cubemap-sky/negative-x.jpg', 512, 'TEXTURE_CUBE_MAP_NEGATIVE_X'],
-  [baseDir+'texture/cubemap-sky/positive-y.jpg', 512, 'TEXTURE_CUBE_MAP_POSITIVE_Y'],
-  [baseDir+'texture/cubemap-sky/negative-y.jpg', 512, 'TEXTURE_CUBE_MAP_NEGATIVE_Y'],
-  [baseDir+'texture/cubemap-sky/positive-z.jpg', 512, 'TEXTURE_CUBE_MAP_POSITIVE_Z'],
-  [baseDir+'texture/cubemap-sky/negative-z.jpg', 512, 'TEXTURE_CUBE_MAP_NEGATIVE_Z'],
+  [baseDir+'texture/skybox/posx.jpg', 2048, 'TEXTURE_CUBE_MAP_POSITIVE_X'],
+  [baseDir+'texture/skybox/negx.jpg', 2048, 'TEXTURE_CUBE_MAP_NEGATIVE_X'],
+  [baseDir+'texture/skybox/posy.jpg', 2048, 'TEXTURE_CUBE_MAP_POSITIVE_Y'],
+  [baseDir+'texture/skybox/negy.jpg', 2048, 'TEXTURE_CUBE_MAP_NEGATIVE_Y'],
+  [baseDir+'texture/skybox/posz.jpg', 2048, 'TEXTURE_CUBE_MAP_POSITIVE_Z'],
+  [baseDir+'texture/skybox/negz.jpg', 2048, 'TEXTURE_CUBE_MAP_NEGATIVE_Z'],
 ];
