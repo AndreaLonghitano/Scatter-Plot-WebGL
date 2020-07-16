@@ -30,32 +30,32 @@
     programs[1] = utils.createAndCompileShaders(gl, shaderText);
   });
 
+  //cube map shaders
+  await utils.loadFiles([shaderDir + 'vs_env.glsl', shaderDir + 'fs_env.glsl'], function (shaderText) {
+    programs[2] = utils.createAndCompileShaders(gl, shaderText);
+  });
+
   // load dataset
   await utils.get_json(baseDir + "/model/irisCG.json", function (jsonFile) {
     dataset = jsonFile.values;
     classes = [...new Set(dataset.map(item => item.class))];
   });
 
+
+
   imgtx = new Image();
-	imgtx.txNum = 0;
-	imgtx.onload = textureLoaderCallback;
-  imgtx.src = baseDir+"/model/texture_cube.png";
-  
+  imgtx.txNum = 0;
+  imgtx.onload = textureLoaderCallback;
+  imgtx.src = baseDir + "/model/texture_cube.png";
+
   imgtx = new Image();
-	imgtx.txNum = 1;
-	imgtx.onload = textureLoaderCallback;
-  imgtx.src = baseDir+"/model/texture_sphere.png";
+  imgtx.txNum = 1;
+  imgtx.onload = textureLoaderCallback;
+  imgtx.src = baseDir + "/model/texture_sphere.png";
 
 
+  LoadEnvironment();
 
-
-  
-
-
-  
-  
-  
-  
   items = new Array(dataset.length);
   dataset.forEach((element, index) => {
     min_x = Math.min(dataset[index].x, min_x)
@@ -77,8 +77,8 @@
   centroids.forEach((element, index) => {
     centroid_items[index] = new Item([element[0], element[1], element[2]], "centroid");
   });
-  min=new Array(3);
-  max=new Array(3);
+  min = new Array(3);
+  max = new Array(3);
   min.fill(+Infinity);
   max.fill(0);
 
@@ -91,7 +91,7 @@
   sphere = new OBJ.Mesh(sphereObjStr);
   diamondObjStr = await utils.get_objstr(baseDir + "/model/diamond.obj");
   diamond = new OBJ.Mesh(diamondObjStr);
-  models = { 'Cube': cube, 'Sphere': sphere};
+  models = { 'Cube': cube, 'Sphere': sphere };
 
 
   gl.useProgram(programs[0]);
@@ -119,16 +119,19 @@
   programs[0].specularColorHandle = gl.getUniformLocation(programs[0], "specCol");
   programs[0].lightDirMatrixPositionHandle = gl.getUniformLocation(programs[0], 'lightDirMatrix');
   programs[0].eyePosHandler = gl.getUniformLocation(programs[0], "eyePos");
-  programs[0].uvAttributeLocation=gl.getAttribLocation(programs[0], "a_uv");  
+  programs[0].uvAttributeLocation = gl.getAttribLocation(programs[0], "a_uv");
   programs[0].textLocation = gl.getUniformLocation(programs[0], "u_texture");
   programs[0].textureMixHandle = gl.getUniformLocation(programs[0], "texture_mix");
- 
+
   gl.useProgram(programs[1]);
   programs[1].positionAttributeLocation = gl.getAttribLocation(programs[1], "inPosition");
   programs[1].matrixLocation = gl.getUniformLocation(programs[1], "matrix");
   programs[1].color_axes = gl.getUniformLocation(programs[1], "color_axes");
 
-
+  gl.useProgram(programs[2]);
+  programs[2].positionAttributeLocation = gl.getAttribLocation(programs[2], "a_position");
+  programs[2].matrixLocation = gl.getUniformLocation(programs[2], "u_matrix");
+  programs[2].textLocation=gl.getUniformLocation(programs[2],'u_texture');
 
 
 
@@ -136,14 +139,18 @@
 
 
 
-  createVaoObjects(programs[0], "Sphere", vertices = sphere.vertices, normals = sphere.vertexNormals, indices = sphere.indices,uv=sphere.textures);
-  createVaoObjects(programs[0], "Cube", vertices = cube.vertices, normals = cube.vertexNormals, indices = cube.indices,uv=cube.textures);
+  createVaoObjects(programs[0], "Sphere", vertices = sphere.vertices, normals = sphere.vertexNormals, indices = sphere.indices, uv = sphere.textures);
+  createVaoObjects(programs[0], "Cube", vertices = cube.vertices, normals = cube.vertexNormals, indices = cube.indices, uv = cube.textures);
   //createVaoObjects(programs[0], "Diamond", vertices = diamond.vertices, normals = diamond.vertexNormals, indices = diamond.indices,uv=diamond.textures);
   createVaoObjects(programs[1], "Lines", lines_position);
+  var positions = setGeometry(500);
+  console.log(positions);
+  createVaoObjects(programs[2], "Skybox", vertices = positions);
+  
   pyramid = buildPyramid();
   createVaoObjects(programs[1], "Pyramid", vertices = pyramid.vertices, normals = undefined, indices = pyramid.indices);
   listOfPossibleModels = Object.keys(vao);
-  listOfPossibleModels.splice(-2, 2);
+  listOfPossibleModels.splice(-3, 3);
   createUiModelClass();
 
   updateScene();
@@ -152,7 +159,7 @@
 
 
 
-function createVaoObjects(program, nameObject, vertices, normals = undefined, indices = undefined,uv = undefined) {
+function createVaoObjects(program, nameObject, vertices, normals = undefined, indices = undefined, uv = undefined) {
   gl.useProgram(program);
   vao[nameObject] = gl.createVertexArray();
   gl.bindVertexArray(vao[nameObject]);
@@ -180,7 +187,7 @@ function createVaoObjects(program, nameObject, vertices, normals = undefined, in
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
   }
-  if(!(uv== undefined)){
+  if (!(uv == undefined)) {
     var uvBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uv), gl.STATIC_DRAW); // the uv coordinates are in the cubeDefintion files
@@ -327,7 +334,7 @@ function drawScene() {
     else {
       last_centroid = ObjKMeans.centroids;
       new_values = ObjKMeans.performSteps();
-      
+
       count_frames = 0;
     }
   }
@@ -340,14 +347,14 @@ function drawScene() {
       centroid_items[index].set_y(anim_points[index].y);
       centroid_items[index].set_z(anim_points[index].z);
     });
-    for (var i=0;i<centroids.length;i++){
-      var el=[];
-      new_values.assignments.forEach((element,index)=>{
-        if (element==i) el.push(index);
+    for (var i = 0; i < centroids.length; i++) {
+      var el = [];
+      new_values.assignments.forEach((element, index) => {
+        if (element == i) el.push(index);
       });
-      el.forEach((e)=>{
-        min[i]=Math.min(util_distances.euclidean([dataset[e].x,dataset[e].y,dataset[e].z],[anim_points[i].x,anim_points[i].y,anim_points[i].z]),min[i]);
-        max[i]=Math.max(util_distances.euclidean([dataset[e].x,dataset[e].y,dataset[e].z],[anim_points[i].x,anim_points[i].y,anim_points[i].z]),max[i]);
+      el.forEach((e) => {
+        min[i] = Math.min(util_distances.euclidean([dataset[e].x, dataset[e].y, dataset[e].z], [anim_points[i].x, anim_points[i].y, anim_points[i].z]), min[i]);
+        max[i] = Math.max(util_distances.euclidean([dataset[e].x, dataset[e].y, dataset[e].z], [anim_points[i].x, anim_points[i].y, anim_points[i].z]), max[i]);
       })
     }
 
@@ -364,10 +371,10 @@ function drawScene() {
   gl.useProgram(programs[0]);
 
   if (new_values !== undefined) {
-    
+
     // render centroids
     for (let i = 0; i < centroids.length; i++) {
-      
+
       var shape = listOfPossibleModels[1];
       var worldMatrix = centroid_items[i].worldM;
 
@@ -404,7 +411,7 @@ function drawScene() {
       gl.bindVertexArray(vao[shape]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[shape].indices.length, gl.UNSIGNED_SHORT, 0);
     }
-    
+
     for (var i = 0; i < dataset.length && anim_points.length; i++) {
 
       var objSelected = $('#class' + dataset[i].class).val();
@@ -420,13 +427,13 @@ function drawScene() {
       var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
       var cluster_color = centroid_colors[new_values.assignments[i]];
-      var distance_p_centroid = util_distances.euclidean([dataset[i].x,dataset[i].y,dataset[i].z], [anim_points[new_values.assignments[i]].x,anim_points[new_values.assignments[i]].y, anim_points[new_values.assignments[i]].z]);
+      var distance_p_centroid = util_distances.euclidean([dataset[i].x, dataset[i].y, dataset[i].z], [anim_points[new_values.assignments[i]].x, anim_points[new_values.assignments[i]].y, anim_points[new_values.assignments[i]].z]);
       var distance_norm = normalize(distance_p_centroid, min[new_values.assignments[i]], max[new_values.assignments[i]]);
       var final_color = new Array();
       for (let i = 0; i < cluster_color.length; i++) {
         final_color[i] = cluster_color[i] * (1 - distance_norm);
-        }
-      if(i==0){console.log(final_color);}
+      }
+      if (i == 0) { console.log(final_color); }
       var color = i == object_selected ? cubeMaterialColor : final_color;
 
       gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
@@ -449,16 +456,16 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-      gl.uniform1f(programs[0].textureMixHandle, texture_mix*0.5);
+      gl.uniform1f(programs[0].textureMixHandle, texture_mix * 0.5);
 
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
-    } 
-  
+    }
+
 
   }
 
-  else{
+  else {
     for (i = 0; i < dataset.length; i++) {
 
       if (dataset[i].x < (min_x + (x_range.valueLow * (max_x - min_x) / 100)) || dataset[i].x > (max_x - (1 - x_range.valueHigh / 100) * (max_x - min_x)) ||
@@ -485,7 +492,7 @@ function drawScene() {
 
       gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
 
-      
+
       var color = i == object_selected ? cubeMaterialColor : colorDiffuseClass[dataset[i].class];
 
       gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
@@ -508,14 +515,24 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-      gl.uniform1f(programs[0].textureMixHandle, texture_mix*0.5);
+      gl.uniform1f(programs[0].textureMixHandle, texture_mix * 0.5);
 
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
     }
   }
 
+  gl.useProgram(programs[2]);
+  gl.disable(gl.CULL_FACE);
+  gl.bindVertexArray(vao['Skybox']);
+  
+  var transposeViewMatrix = utils.transposeMatrix(viewMatrix);
+  // (A*B)^T = B^T * A^T
+  var viewProjectionMatrix = utils.multiplyMatrices(transposeViewMatrix, utils.transposeMatrix(perspectiveMatrix));
 
+  gl.uniformMatrix4fv(programs[2].matrixLocation, false, viewProjectionMatrix);
+  gl.uniform1i(programs[2].textLocation,3);
+  gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
 }
 
 
@@ -762,19 +779,89 @@ function initializeControlPoint() {
 
 }
 
-function normalize(val, min, max){
-  return (val - min) / (max - min); 
+function normalize(val, min, max) {
+  return (val - min) / (max - min);
 }
 
 // texture loader callback
-var textureLoaderCallback = function() {
-	var textureId = gl.createTexture();
-	gl.activeTexture(gl.TEXTURE0 + this.txNum);
-	gl.bindTexture(gl.TEXTURE_2D, textureId);		
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this);		
-// set the filtering so we don't need mips
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+var textureLoaderCallback = function () {
+  var textureId = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0 + this.txNum);
+  gl.bindTexture(gl.TEXTURE_2D, textureId);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this);
+  // set the filtering so we don't need mips
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
 }
+
+// load the environment map
+function LoadEnvironment() {
+  // Create a texture.
+  var texture = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE3);
+  gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+  textureCubemapSrc.forEach(([src, dim, type]) => {
+    let img = new Image();
+    gl.texImage2D(gl[type], 0, gl.RGBA, dim, dim, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    img.addEventListener('load', () => {
+      gl.activeTexture(gl.TEXTURE3);
+      gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+      gl.texImage2D(gl[type], 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+    });
+    img.src = src;
+  });
+  gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+}
+
+function setGeometry(size) {
+  var positions = 
+    [
+    -size, -size,  -size,
+    -size,  size,  -size,
+     size, -size,  -size,
+    -size,  size,  -size,
+     size,  size,  -size,
+     size, -size,  -size,
+
+    -size, -size,   size,
+     size, -size,   size,
+    -size,  size,   size,
+    -size,  size,   size,
+     size, -size,   size,
+     size,  size,   size,
+
+    -size,   size, -size,
+    -size,   size,  size,
+     size,   size, -size,
+    -size,   size,  size,
+     size,   size,  size,
+     size,   size, -size,
+
+    -size,  -size, -size,
+     size,  -size, -size,
+    -size,  -size,  size,
+    -size,  -size,  size,
+     size,  -size, -size,
+     size,  -size,  size,
+
+    -size,  -size, -size,
+    -size,  -size,  size,
+    -size,   size, -size,
+    -size,  -size,  size,
+    -size,   size,  size,
+    -size,   size, -size,
+
+     size,  -size, -size,
+     size,   size, -size,
+     size,  -size,  size,
+     size,  -size,  size,
+     size,   size, -size,
+     size,   size,  size,
+
+    ];
+    return positions;
+  }

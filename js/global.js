@@ -224,3 +224,12 @@ var z_range=document.getElementById('z_range');
 
 var texture=[];
 var texture_mix=1;
+
+const textureCubemapSrc = [
+  [baseDir+'texture/cubemap-sky/positive-x.jpg', 512, 'TEXTURE_CUBE_MAP_POSITIVE_X'],
+  [baseDir+'texture/cubemap-sky/negative-x.jpg', 512, 'TEXTURE_CUBE_MAP_NEGATIVE_X'],
+  [baseDir+'texture/cubemap-sky/positive-y.jpg', 512, 'TEXTURE_CUBE_MAP_POSITIVE_Y'],
+  [baseDir+'texture/cubemap-sky/negative-y.jpg', 512, 'TEXTURE_CUBE_MAP_NEGATIVE_Y'],
+  [baseDir+'texture/cubemap-sky/positive-z.jpg', 512, 'TEXTURE_CUBE_MAP_POSITIVE_Z'],
+  [baseDir+'texture/cubemap-sky/negative-z.jpg', 512, 'TEXTURE_CUBE_MAP_NEGATIVE_Z'],
+];
