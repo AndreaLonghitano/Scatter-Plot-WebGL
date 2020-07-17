@@ -59,11 +59,10 @@ function onMouseUp(ev){
         }
             // delete the color of this object eventually
         else if (min_index!==+Infinity){
-        console.log("The element "+i+"was selected and it's a "+ dataset[min_index].class);
         $('#text').css('z-index',1);
-        $('#x_coordinate').text(items[min_index].get_x());
-        $('#y_coordinate').text(items[min_index].get_y());
-        $('#z_coordinate').text(items[min_index].get_z());
+        $('#x_coordinate').text(Math.round(items[min_index].get_x()*Math.pow(10,3))/Math.pow(10,3));
+        $('#y_coordinate').text(Math.round(items[min_index].get_y()*Math.pow(10,3))/Math.pow(10,3));
+        $('#z_coordinate').text(Math.round(items[min_index].get_z()*Math.pow(10,3))/Math.pow(10,3));
         $('#class_selected').text(items[min_index].class);
         object_selected=min_index;
         }
