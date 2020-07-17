@@ -134,17 +134,11 @@ vec3 computeSpecularLight(vec3 eyeDir, vec3 lightDir, vec3 normalVector, vec3 li
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir){
    float height =  texture(depthMap, texCoords).r;    
-   vec2 p = viewDir.xy / viewDir.z * (height * 0.1);
+   vec2 p = viewDir.xy / viewDir.z * (height * 0.02);
   return texCoords - p;    
 }
 
-
-void main() {
-
-  vec3 nNormal = normalize(fsNormal); /* normalizza sempre perche è bene farlo */
-  vec3 eyedirVec = normalize(eyePos.xyz - fsPosition);
-
-
+vec3 NormalMapping(vec3 fsPosition, vec2 fs_uv, vec3 nNormal){
   vec3 p_dx = dFdx(fsPosition);
   vec3 p_dy = dFdy(fsPosition);
   vec2 tc_dx = dFdx(fs_uv);
@@ -156,12 +150,38 @@ void main() {
   vec3 color=vec3(texture(normalMap,fs_uv));
   nNormal=normalize((color*2.0)-1.0);
   nNormal=tbn*nNormal;
+  return nNormal;
+}
 
-  //vec2 fs_uv= ParallaxMapping(fs_uv,eyedirVec);
 
+void main() {
+
+  vec3 nNormal = normalize(fsNormal); /* normalizza sempre perche è bene farlo */
+  vec3 eyedirVec = normalize(eyePos.xyz - fsPosition);
+  bool enable_text=true;
+  bool enable_pMap=true;
+  bool enable_nMap=true;
+  vec3 texColor;
+  vec2 pMap_uv;
+
+  if(enable_text){
+    if(enable_pMap){
+      //Parallax Map Computation
+      pMap_uv = ParallaxMapping(fs_uv, eyedirVec);
+    }
+    else pMap_uv = fs_uv;
+    if(enable_nMap){
+      //Normal Map Computation
+      nNormal = NormalMapping(fsPosition,pMap_uv,nNormal);  
+    }
+    
+    //Texture Color
+    texColor = vec3(texture(u_texture, pMap_uv));
+  }  
+  
 
   vec3 lightPos = L1_Pos.xyz;
-  vec3 texColor = vec3(texture(u_texture,fs_uv));
+  
   //direct light
   vec3 lDir = computeLightDir(lightPos, L1_lightDirection);
   vec3 lColor = computeLightColor(lightPos);
