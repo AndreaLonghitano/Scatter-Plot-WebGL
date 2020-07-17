@@ -48,6 +48,9 @@ uniform sampler2D u_texture;
 uniform float texture_mix;
 uniform sampler2D normalMap;
 uniform sampler2D depthMap;
+uniform bool enable_text;
+uniform bool enable_pMap;
+uniform bool enable_nMap;
 
 vec3 computeLightDir(vec3 lightPos, vec3 lightDir) {
 	
@@ -158,9 +161,6 @@ void main() {
 
   vec3 nNormal = normalize(fsNormal); /* normalizza sempre perche è bene farlo */
   vec3 eyedirVec = normalize(eyePos.xyz - fsPosition);
-  bool enable_text=true;
-  bool enable_pMap=true;
-  bool enable_nMap=true;
   vec3 texColor;
   vec2 pMap_uv;
 

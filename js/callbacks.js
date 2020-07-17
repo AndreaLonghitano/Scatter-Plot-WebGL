@@ -256,6 +256,21 @@ $("#beta_ambient").on('input change',function(){
 });
 
 $("#texactive").click(()=>{
-  texture_mix= 1 - texture_mix;
+  textEnable= 1 - textEnable;
+
+});
+
+$("#texture_mix").on('input change',function(){
+  textureMix=this.value/100;
+
+});
+
+
+$("#nMapActive").click(()=>{
+  nMapEnable= 1 - nMapEnable;
+});
+
+$("#pMapActive").click(()=>{
+  pMapEnable= 1 - pMapEnable;
 });
 

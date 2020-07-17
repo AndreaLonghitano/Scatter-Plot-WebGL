@@ -127,7 +127,9 @@
   programs[0].textureMixHandle = gl.getUniformLocation(programs[0], "texture_mix");
   programs[0].normalMapHandle = gl.getUniformLocation(programs[0], "normalMap");
   programs[0].heightMapHandle = gl.getUniformLocation(programs[0], "depthMap");
-
+  programs[0].textEnableHandle = gl.getUniformLocation(programs[0], "enable_text");
+  programs[0].nMapEnableHandle = gl.getUniformLocation(programs[0], "enable_nMap");
+  programs[0].pMapEnableHandle = gl.getUniformLocation(programs[0], "enable_pMap");
 
   gl.useProgram(programs[1]);
   programs[1].positionAttributeLocation = gl.getAttribLocation(programs[1], "inPosition");
@@ -459,10 +461,13 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-      gl.uniform1f(programs[0].textureMixHandle, texture_mix*0.5);
       gl.uniform1i(programs[0].textLocation,0); 
       gl.uniform1i(programs[0].normalMapHandle,1);
       gl.uniform1i(programs[0].heightMapHandle,2);
+      gl.uniform1f(programs[0].textureMixHandle, textureMix);
+      gl.uniform1i(programs[0].textEnableHandle, textEnable);
+      gl.uniform1i(programs[0].nMapEnableHandle, nMapEnable);
+      gl.uniform1i(programs[0].pMapEnableHandle, pMapEnable);
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
     }
@@ -520,10 +525,13 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-      gl.uniform1f(programs[0].textureMixHandle, texture_mix*0.5);
+      gl.uniform1f(programs[0].textureMixHandle, textureMix);
       gl.uniform1i(programs[0].textLocation,0); 
       gl.uniform1i(programs[0].normalMapHandle,1);
       gl.uniform1i(programs[0].heightMapHandle,2);
+      gl.uniform1i(programs[0].textEnableHandle, textEnable);
+      gl.uniform1i(programs[0].nMapEnableHandle, nMapEnable);
+      gl.uniform1i(programs[0].pMapEnableHandle, pMapEnable);
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
     }

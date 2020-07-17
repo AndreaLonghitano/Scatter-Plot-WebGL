@@ -222,7 +222,10 @@ var z_range=document.getElementById('z_range');
 
 
 var texture=[];
-var texture_mix=1;
+var textEnable = 1;
+var nMapEnable = 1;
+var pMapEnable = 1;
+var textureMix = document.getElementById("texture_mix").value/100;
 
 const textureCubemapSrc = [
   [baseDir+'texture/skybox/posx.jpg', 2048, 'TEXTURE_CUBE_MAP_POSITIVE_X'],
