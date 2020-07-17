@@ -46,6 +46,8 @@ uniform float L1_Target;
 in vec2 fs_uv;
 uniform sampler2D u_texture;
 uniform float texture_mix;
+uniform sampler2D normalMap;
+uniform sampler2D depthMap;
 
 vec3 computeLightDir(vec3 lightPos, vec3 lightDir) {
 	
@@ -130,10 +132,34 @@ vec3 computeSpecularLight(vec3 eyeDir, vec3 lightDir, vec3 normalVector, vec3 li
   return blinnSpecular * specularType.x + phongSpecular*specularType.y ;
 }
 
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir){
+   float height =  texture(depthMap, texCoords).r;    
+   vec2 p = viewDir.xy / viewDir.z * (height * 0.1);
+  return texCoords - p;    
+}
+
+
 void main() {
 
   vec3 nNormal = normalize(fsNormal); /* normalizza sempre perche è bene farlo */
   vec3 eyedirVec = normalize(eyePos.xyz - fsPosition);
+
+
+  vec3 p_dx = dFdx(fsPosition);
+  vec3 p_dy = dFdy(fsPosition);
+  vec2 tc_dx = dFdx(fs_uv);
+  vec2 tc_dy = dFdy(fs_uv);
+  vec3 t = (tc_dy.y * p_dx - tc_dx.y * p_dy) /(tc_dx.x*tc_dy.y - tc_dy.x*tc_dx.y);
+  t = normalize(t - nNormal * dot(nNormal, t));
+  vec3 b = normalize(cross(nNormal,t));
+  mat3 tbn = mat3(t, b, nNormal);
+  vec3 color=vec3(texture(normalMap,fs_uv));
+  nNormal=normalize((color*2.0)-1.0);
+  nNormal=tbn*nNormal;
+
+  //vec2 fs_uv= ParallaxMapping(fs_uv,eyedirVec);
+
+
   vec3 lightPos = L1_Pos.xyz;
   vec3 texColor = vec3(texture(u_texture,fs_uv));
   //direct light

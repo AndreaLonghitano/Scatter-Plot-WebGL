@@ -9,12 +9,7 @@ var callbacks={
         if(keys[event.keyCode]) {
           keys[event.keyCode] = false;
         switch(event.keyCode){
-          // press 1
-          case KEY_CODE.ONE:
-            if (!document.fullscreenElement) {
-              callbacks.toggleFullScreen();
-            }
-          break;
+          
           // W
           case KEY_CODE.W:
             vz += 1.0;
@@ -201,13 +196,7 @@ var callbacks={
                 break;
                 }
               }
-            },
-
-    toggleFullScreen:()=>{
-        if(!document.fullscreenElement) {
-            canvas.requestFullscreen();
-        }
-    },
+            }
   }
 
 

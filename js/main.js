@@ -11,8 +11,6 @@
     });
     return;
   }
-  utils.resizeCanvasToDisplaySize(gl.canvas);
-
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0.85, 0.85, 0.85, 1.0);
@@ -46,12 +44,17 @@
   imgtx = new Image();
   imgtx.txNum = 0;
   imgtx.onload = textureLoaderCallback;
-  imgtx.src = baseDir + "/model/texture_cube.png";
+  imgtx.src = baseDir + "/texture/cube/brick_color.png";
 
   imgtx = new Image();
   imgtx.txNum = 1;
   imgtx.onload = textureLoaderCallback;
-  imgtx.src = baseDir + "/model/texture_sphere.png";
+  imgtx.src = baseDir + "/texture/cube/brick_normal.png";
+
+  imgtx = new Image();
+  imgtx.txNum = 2;
+  imgtx.onload = textureLoaderCallback;
+  imgtx.src = baseDir + "/texture/cube/brick_height.png";
 
 
   LoadEnvironment();
@@ -122,6 +125,9 @@
   programs[0].uvAttributeLocation = gl.getAttribLocation(programs[0], "a_uv");
   programs[0].textLocation = gl.getUniformLocation(programs[0], "u_texture");
   programs[0].textureMixHandle = gl.getUniformLocation(programs[0], "texture_mix");
+  programs[0].normalMapHandle = gl.getUniformLocation(programs[0], "normalMap");
+  programs[0].heightMapHandle = gl.getUniformLocation(programs[0], "depthMap");
+
 
   gl.useProgram(programs[1]);
   programs[1].positionAttributeLocation = gl.getAttribLocation(programs[1], "inPosition");
@@ -141,10 +147,8 @@
 
   createVaoObjects(programs[0], "Sphere", vertices = sphere.vertices, normals = sphere.vertexNormals, indices = sphere.indices, uv = sphere.textures);
   createVaoObjects(programs[0], "Cube", vertices = cube.vertices, normals = cube.vertexNormals, indices = cube.indices, uv = cube.textures);
-  //createVaoObjects(programs[0], "Diamond", vertices = diamond.vertices, normals = diamond.vertexNormals, indices = diamond.indices,uv=diamond.textures);
   createVaoObjects(programs[1], "Lines", lines_position);
   var positions = setGeometry(500);
-  console.log(positions);
   createVaoObjects(programs[2], "Skybox", vertices = positions);
   
   pyramid = buildPyramid();
@@ -433,7 +437,6 @@ function drawScene() {
       for (let i = 0; i < cluster_color.length; i++) {
         final_color[i] = cluster_color[i] * (1 - distance_norm);
       }
-      if (i == 0) { console.log(final_color); }
       var color = i == object_selected ? cubeMaterialColor : final_color;
 
       gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
@@ -456,8 +459,10 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-      gl.uniform1f(programs[0].textureMixHandle, texture_mix * 0.5);
-
+      gl.uniform1f(programs[0].textureMixHandle, texture_mix*0.5);
+      gl.uniform1i(programs[0].textLocation,0); 
+      gl.uniform1i(programs[0].normalMapHandle,1);
+      gl.uniform1i(programs[0].heightMapHandle,2);
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
     }
@@ -515,8 +520,10 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-      gl.uniform1f(programs[0].textureMixHandle, texture_mix * 0.5);
-
+      gl.uniform1f(programs[0].textureMixHandle, texture_mix*0.5);
+      gl.uniform1i(programs[0].textLocation,0); 
+      gl.uniform1i(programs[0].normalMapHandle,1);
+      gl.uniform1i(programs[0].heightMapHandle,2);
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
     }

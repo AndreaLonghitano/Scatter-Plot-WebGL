@@ -7,7 +7,6 @@ const KEY_CODE = {
   'D': 68,
   'K': 75,
   'P': 80,
-  'ONE': 49,
   'E':69,
   'Q':81,
   "ARROWUP": 38,
