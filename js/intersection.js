@@ -1,5 +1,4 @@
 function onMouseUp(ev){
-    console.log("FIREEED");
     //This is a way of calculating the coordinates of the click in the canvas taking into account its possible displacement in the page
     var top = 0.0, left = 0.0;
     canvas = gl.canvas;
@@ -16,7 +15,6 @@ function onMouseUp(ev){
      var normY = 1 - (2*y) / gl.canvas.height;
   
      if(Math.abs(normX)<=1 && Math.abs(normY)<=1){
-        console.log("FIREEED");
   
         /* Perspective*view*world*/
         //We need to go through the transformation pipeline in the inverse order so we invert the matrices
@@ -35,37 +33,39 @@ function onMouseUp(ev){
     
         var min_index=+Infinity;
         var distance_hit_min=+Infinity;
-        for(i = 0; i < items.length && items[i].get_display(); i++){
-            var objSelected=$('#class'+dataset[i].class).val();
-            var ele=listOfPossibleModels[objSelected];
-        
-        
-            if (ele=="Sphere"){
-                distance_hit = raySphereIntersection(rayStartPoint, normalisedRayDir, items[i], RADIUS); //in the sphere there is no need to pass the model matrix
+        for(i = 0; i < items.length; i++){
+            if(items[i].get_display()){
+                var objSelected=$('#class'+dataset[i].class).val();
+                var ele=listOfPossibleModels[objSelected];
+            
+            
+                if (ele=="Sphere"){
+                    distance_hit = raySphereIntersection(rayStartPoint, normalisedRayDir, items[i], RADIUS); //in the sphere there is no need to pass the model matrix
+                }
+                else{ // cubo 
+                    distance_hit=RayOBBIntersection(rayStartPoint,normalisedRayDir,[-1.0, -1.0, -1.0].map(function(x) { return x * RADIUS}) ,[1.0, 1.0, 1.0].map(function(x) { return x * RADIUS}),items[i].get_worldMatrix(),RADIUS);
+                }
+            
+                if(distance_hit>0){
+                    min_index = distance_hit < distance_hit_min ? i : min_index; // prendi l'oggett
+                    distance_hit_min=  distance_hit < distance_hit_min   ? distance_hit  : distance_hit_min; 
+                }
+                }
+            
+                if(min_index==+Infinity && $('#text').css('z-index')==1){
+                    $('#text').css('z-index',-1);
+                    object_selected=-1;
+                }
+                    // delete the color of this object eventually
+                else if (min_index!==+Infinity){
+                $('#text').css('z-index',1);
+                $('#x_coordinate').text(Math.round(items[min_index].get_x()*Math.pow(10,3))/Math.pow(10,3));
+                $('#y_coordinate').text(Math.round(items[min_index].get_y()*Math.pow(10,3))/Math.pow(10,3));
+                $('#z_coordinate').text(Math.round(items[min_index].get_z()*Math.pow(10,3))/Math.pow(10,3));
+                $('#class_selected').text(items[min_index].class);
+                object_selected=min_index;
             }
-            else{ // cubo 
-                distance_hit=RayOBBIntersection(rayStartPoint,normalisedRayDir,[-1.0, -1.0, -1.0].map(function(x) { return x * RADIUS}) ,[1.0, 1.0, 1.0].map(function(x) { return x * RADIUS}),items[i].get_worldMatrix(),RADIUS);
-            }
-        
-            if(distance_hit>0){
-                min_index = distance_hit < distance_hit_min ? i : min_index; // prendi l'oggett
-                distance_hit_min=  distance_hit < distance_hit_min   ? distance_hit  : distance_hit_min; 
-            }
-            }
-        
-        if(min_index==+Infinity && $('#text').css('z-index')==1){
-            $('#text').css('z-index',-1);
-            object_selected=-1;
-        }
-            // delete the color of this object eventually
-        else if (min_index!==+Infinity){
-        $('#text').css('z-index',1);
-        $('#x_coordinate').text(Math.round(items[min_index].get_x()*Math.pow(10,3))/Math.pow(10,3));
-        $('#y_coordinate').text(Math.round(items[min_index].get_y()*Math.pow(10,3))/Math.pow(10,3));
-        $('#z_coordinate').text(Math.round(items[min_index].get_z()*Math.pow(10,3))/Math.pow(10,3));
-        $('#class_selected').text(items[min_index].class);
-        object_selected=min_index;
-        }
+        }   
   
   }
   }
