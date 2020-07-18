@@ -184,6 +184,7 @@ function drawScene() {
   else if ((kmeans && count_frames == FRAME_RATE_KMEANS)) {
     if (ObjKMeans.end) {
       kmeans = !kmeans;
+      $("#K").css('background-color',color_button);
     }
     else {
       last_centroid = ObjKMeans.centroids;
@@ -260,7 +261,6 @@ function drawScene() {
 
       var objSelected = $('#class' + dataset[i].class).val();
       var ele = listOfPossibleModels[objSelected];
-
       var worldMatrix = items[i].worldM;
       var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
       var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
@@ -374,7 +374,7 @@ function drawScene() {
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
     }
   }
-
+  // draw the skybox here
   gl.useProgram(programs[2]);
   gl.disable(gl.CULL_FACE);
   gl.bindVertexArray(vao['Skybox']);

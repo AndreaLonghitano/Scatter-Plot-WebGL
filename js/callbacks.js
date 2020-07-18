@@ -162,12 +162,8 @@ var callbacks={
                   if(!($('#x_range').prop('disabled'))){
                     $(".multirange").prop('disabled', true);
                   items.forEach((element,index) => {
-                    if(items[index].get_display()){
                       dataset_kMeans.push([element.get_x(),element.get_y(),element.get_z()]);
-                      selected_element.push(index);
-                    }
                   });
-                  console.log(selected_element);
                   ObjKMeans=new KMeans(dataset_kMeans,centroids,"slow","euclidean");
                   last_centroid=centroids;
                 }
