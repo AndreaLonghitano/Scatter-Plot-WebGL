@@ -52,6 +52,13 @@ uniform bool enable_text;
 uniform bool enable_pMap;
 uniform bool enable_nMap;
 
+//fog
+in vec3 v_position;
+uniform float fogNear;
+uniform float fogFar;
+uniform vec4 fogColor;
+uniform bool enablefog;
+
 vec3 computeLightDir(vec3 lightPos, vec3 lightDir) {
 	
 	//Direct
@@ -196,5 +203,15 @@ void main() {
   vec3 specularColor = specular * specCol;
   
   //Final Color
-  outColor = vec4(clamp(diffuse + ambient + emitColor + specularColor, 0.0, 1.0), 1.0);
+  vec4 final_color = vec4(clamp(diffuse + ambient + emitColor + specularColor, 0.0, 1.0), 1.0);
+
+   if(enablefog){
+      //evaluate the color of the output using linear model
+      float fogDistance = length(v_position);
+      float fogAmount = smoothstep(fogNear, fogFar, fogDistance);
+      outColor=mix(final_color, fogColor, fogAmount);
+      }
+      else{
+         outColor=final_color;
+      }
   }

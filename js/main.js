@@ -96,7 +96,8 @@
   gl.useProgram(programs[0]);
   programs[0].positionAttributeLocation = gl.getAttribLocation(programs[0], "inPosition");
   programs[0].normalAttributeLocation = gl.getAttribLocation(programs[0], "inNormal");
-  programs[0].matrixLocation = gl.getUniformLocation(programs[0], "matrix");
+  programs[0].perspectiveLocation = gl.getUniformLocation(programs[0], "perspective");
+  programs[0].worldViewLocation = gl.getUniformLocation(programs[0], "ModelView");
   programs[0].materialDiffColorHandle = gl.getUniformLocation(programs[0], 'mDiffColor');
   programs[0].diffuseTypeHandle = gl.getUniformLocation(programs[0], "diffuseType");
   programs[0].lightDirectionHandle = gl.getUniformLocation(programs[0], 'L1_lightDirection');
@@ -126,9 +127,10 @@
   programs[0].textEnableHandle = gl.getUniformLocation(programs[0], "enable_text");
   programs[0].nMapEnableHandle = gl.getUniformLocation(programs[0], "enable_nMap");
   programs[0].pMapEnableHandle = gl.getUniformLocation(programs[0], "enable_pMap");
+  
 
   //fog
-  programs[0].enableFog=gl.getAttribLocation(programs[0], "enablefog");
+  programs[0].enableFog=gl.getUniformLocation(programs[0], "enablefog");
   programs[0].fogNear=gl.getUniformLocation(programs[0], "fogNear");
   programs[0].fogFar=gl.getUniformLocation(programs[0], "fogFar");
   programs[0].fogColor=gl.getUniformLocation(programs[0], "fogColor");
@@ -238,13 +240,15 @@ function drawScene() {
       var worldMatrix = centroid_items[i].worldM;
 
       var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
-      var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
+      
       var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [cx, cy, cz, 1.0]);
       var lightPosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [dirLightPos_x, dirLightPos_y, dirLightPos_z, 1.0]);
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
       var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
       var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
-      gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
+
+      gl.uniformMatrix4fv(programs[0].perspectiveLocation, gl.FALSE, utils.transposeMatrix(perspectiveMatrix));
+      gl.uniformMatrix4fv(programs[0].worldViewLocation, gl.FALSE, utils.transposeMatrix(worldViewMatrix));
 
       var colorCentroid = centroid_colors[i];
       gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
@@ -267,6 +271,15 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
+
+      //fog
+      gl.uniform1i(programs[0].enableFog, enable_fog);
+      gl.uniform1f(programs[0].fogFar,200.0);
+      gl.uniform1f(programs[0].fogNear,0.0)
+      gl.uniform4fv(programs[0].fogColor,fogColor);
+
+
+
       gl.bindVertexArray(vao[shape]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[shape].indices.length, gl.UNSIGNED_SHORT, 0);
     }
@@ -283,7 +296,6 @@ function drawScene() {
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
       var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
       var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
-      gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
       var cluster_color = centroid_colors[new_values.assignments[i]];
       var distance_p_centroid = util_distances.euclidean([dataset[i].x, dataset[i].y, dataset[i].z], [anim_points[new_values.assignments[i]].x, anim_points[new_values.assignments[i]].y, anim_points[new_values.assignments[i]].z]);
       var distance_norm = normalize(distance_p_centroid, min[new_values.assignments[i]], max[new_values.assignments[i]]);
@@ -292,6 +304,10 @@ function drawScene() {
         final_color[i] = cluster_color[i] * (1 - distance_norm);
       }
       var color = i == object_selected ? cubeMaterialColor : final_color;
+
+      gl.uniformMatrix4fv(programs[0].perspectiveLocation, gl.FALSE, utils.transposeMatrix(perspectiveMatrix));
+      gl.uniformMatrix4fv(programs[0].worldViewLocation, gl.FALSE, utils.transposeMatrix(worldViewMatrix));
+
 
       gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
       gl.uniform3fv(programs[0].materialDiffColorHandle, color);
@@ -320,6 +336,14 @@ function drawScene() {
       gl.uniform1i(programs[0].textEnableHandle, textEnable);
       gl.uniform1i(programs[0].nMapEnableHandle, nMapEnable);
       gl.uniform1i(programs[0].pMapEnableHandle, pMapEnable);
+
+      //fog 
+      //fog
+      gl.uniform1i(programs[0].enableFog, enable_fog);
+      gl.uniform1f(programs[0].fogFar,200.0);
+      gl.uniform1f(programs[0].fogNear,0.0)
+      gl.uniform4fv(programs[0].fogColor,fogColor);
+
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
     }
@@ -337,22 +361,19 @@ function drawScene() {
         continue;
       }
 
-
-
-
       var objSelected = $('#class' + dataset[i].class).val();
       var ele = listOfPossibleModels[objSelected];
 
       var worldMatrix = items[i].worldM;
       var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
-      var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
       var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [cx, cy, cz, 1.0]);
       var lightPosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [dirLightPos_x, dirLightPos_y, dirLightPos_z, 1.0]);
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
       var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
       var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
 
-      gl.uniformMatrix4fv(programs[0].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
+      gl.uniformMatrix4fv(programs[0].perspectiveLocation, gl.FALSE, utils.transposeMatrix(perspectiveMatrix));
+      gl.uniformMatrix4fv(programs[0].worldViewLocation, gl.FALSE, utils.transposeMatrix(worldViewMatrix));
 
 
       var color = i == object_selected ? cubeMaterialColor : colorDiffuseClass[dataset[i].class];
@@ -377,6 +398,7 @@ function drawScene() {
       gl.uniform1f(programs[0].specShineHandle, SpecShine);
       gl.uniform3fv(programs[0].specularColorHandle, specularColor);
       gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
+      //texture
       gl.uniform1f(programs[0].textureMixHandle, textureMix);
       gl.uniform1i(programs[0].textLocation,0); 
       gl.uniform1i(programs[0].normalMapHandle,1);
@@ -384,6 +406,13 @@ function drawScene() {
       gl.uniform1i(programs[0].textEnableHandle, textEnable);
       gl.uniform1i(programs[0].nMapEnableHandle, nMapEnable);
       gl.uniform1i(programs[0].pMapEnableHandle, pMapEnable);
+
+      //fog
+      gl.uniform1i(programs[0].enableFog, enable_fog);
+      gl.uniform1f(programs[0].fogFar,200.0);
+      gl.uniform1f(programs[0].fogNear,0.0)
+      gl.uniform4fv(programs[0].fogColor,fogColor);
+
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
     }
@@ -392,14 +421,9 @@ function drawScene() {
   gl.useProgram(programs[2]);
   gl.disable(gl.CULL_FACE);
   gl.bindVertexArray(vao['Skybox']);
-  
-  var transposeViewMatrix = utils.transposeMatrix(viewMatrix);
   // (A*B)^T = B^T * A^T
-  var viewProjectionMatrix = utils.multiplyMatrices(transposeViewMatrix, utils.transposeMatrix(perspectiveMatrix));
-
-
   gl.uniformMatrix4fv(programs[2].perspectiveLocation, false,utils.transposeMatrix(perspectiveMatrix));
-  gl.uniformMatrix4fv(programs[2].ViewLocation, false, transposeViewMatrix);
+  gl.uniformMatrix4fv(programs[2].ViewLocation, false, utils.transposeMatrix(viewMatrix));
   //fog
   gl.uniform1i(programs[2].enableFog, enable_fog);
   gl.uniform1f(programs[2].fogFar,800.0);
