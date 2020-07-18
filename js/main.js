@@ -127,6 +127,13 @@
   programs[0].nMapEnableHandle = gl.getUniformLocation(programs[0], "enable_nMap");
   programs[0].pMapEnableHandle = gl.getUniformLocation(programs[0], "enable_pMap");
 
+  //fog
+  programs[0].enableFog=gl.getAttribLocation(programs[0], "enablefog");
+  programs[0].fogNear=gl.getUniformLocation(programs[0], "fogNear");
+  programs[0].fogFar=gl.getUniformLocation(programs[0], "fogFar");
+  programs[0].fogColor=gl.getUniformLocation(programs[0], "fogColor");
+
+
   gl.useProgram(programs[1]);
   programs[1].positionAttributeLocation = gl.getAttribLocation(programs[1], "inPosition");
   programs[1].matrixLocation = gl.getUniformLocation(programs[1], "matrix");
@@ -134,8 +141,15 @@
 
   gl.useProgram(programs[2]);
   programs[2].positionAttributeLocation = gl.getAttribLocation(programs[2], "a_position");
-  programs[2].matrixLocation = gl.getUniformLocation(programs[2], "u_matrix");
+  programs[2].perspectiveLocation = gl.getUniformLocation(programs[2], "perspective");
+  programs[2].ViewLocation = gl.getUniformLocation(programs[2], "View");
   programs[2].textLocation=gl.getUniformLocation(programs[2],'u_texture');
+
+  //fog
+  programs[2].enableFog=gl.getUniformLocation(programs[2], "enablefog");
+  programs[2].fogNear=gl.getUniformLocation(programs[2], "fogNear");
+  programs[2].fogFar=gl.getUniformLocation(programs[2], "fogFar");
+  programs[2].fogColor=gl.getUniformLocation(programs[2], "fogColor");
 
 
   //compute eprspective matrix
@@ -383,7 +397,14 @@ function drawScene() {
   // (A*B)^T = B^T * A^T
   var viewProjectionMatrix = utils.multiplyMatrices(transposeViewMatrix, utils.transposeMatrix(perspectiveMatrix));
 
-  gl.uniformMatrix4fv(programs[2].matrixLocation, false, viewProjectionMatrix);
+
+  gl.uniformMatrix4fv(programs[2].perspectiveLocation, false,utils.transposeMatrix(perspectiveMatrix));
+  gl.uniformMatrix4fv(programs[2].ViewLocation, false, transposeViewMatrix);
+  //fog
+  gl.uniform1i(programs[2].enableFog, enable_fog);
+  gl.uniform1f(programs[2].fogFar,800.0);
+  gl.uniform1f(programs[2].fogNear,0.0);
+  gl.uniform4fv(programs[2].fogColor,fogColor);
   gl.uniform1i(programs[2].textLocation,3);
   gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
 }

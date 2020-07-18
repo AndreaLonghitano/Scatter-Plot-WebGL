@@ -161,7 +161,6 @@ var diffuseType = diffuseTypeDict[0];
 var specularTypeDict = {
   0: [0,0,0,0], //none
   1: [1,0,0,0], //Blinn
-  2: [0,1,0,0] //Phong
 }
 
 var specularType = specularTypeDict[0];
@@ -241,3 +240,8 @@ var bezier = {
     return pFinal;
   }
 }
+
+
+//fog
+var enable_fog=0;
+var fogColor=[208/255.0, 208/255.0, 208/255.0, 1.0];

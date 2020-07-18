@@ -310,5 +310,11 @@ $("#specular-type-select").on('change',function(){
   }
 });
 
+$("#fog").click(()=>{
+  enable_fog=1-enable_fog;
+});
+
+
+
 
 
