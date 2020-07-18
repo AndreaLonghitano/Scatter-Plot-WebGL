@@ -143,9 +143,6 @@ var callbacks={
             rvx = rvx - 1.0;
             break;
 
-
-              break;
-
               
               case KEY_CODE.Q:
                 vy+=1;
@@ -170,12 +167,11 @@ var callbacks={
                       selected_element.push(index);
                     }
                   });
-                  ObjKMeans=new KMeans(dataset_kMeans,centroids,rate_k_means,DISTANCE_KMEANS[0]);
-                  $("#distance_selection").prop('disabled', true);
+                  console.log(selected_element);
+                  ObjKMeans=new KMeans(dataset_kMeans,centroids,"slow","euclidean");
                   last_centroid=centroids;
                 }
                 }
-
                 break;
   
                 // PCA
@@ -262,7 +258,6 @@ $("#texactive").click(()=>{
 
 $("#texture_mix").on('input change',function(){
   textureMix=this.value/100;
-
 });
 
 
@@ -273,4 +268,51 @@ $("#nMapActive").click(()=>{
 $("#pMapActive").click(()=>{
   pMapEnable= 1 - pMapEnable;
 });
+
+$("#light-type-select").on('change',function(){
+  dirLightType = dirLightTypeDict[this.value];
+  if (!this.value) {
+    $("#direct").css("display","block");
+    $("#point").css("display","none");
+    $("#cone").css("display","none");
+  }
+  else if (this.value == 1) {
+    $("#direct").css("display","none");
+    $("#point").css("display","block");
+    $("#cone").css("display","none");
+  }
+  else {
+    $("#direct").css("display","block");
+    $("#point").css("display","block");
+    $("#cone").css("display","block");
+  }
+});
+
+$("#diffuse-type-select").on('change',function(){
+  diffuseType = diffuseTypeDict[this.value];
+
+})
+
+$("#ambient-type-select").on('change',function(){
+  ambientType = ambientTypeDict[this.value];
+  if(this.value==2){
+    $("#hemispheric-dir").css("display","block");
+  }
+  else{
+    $("#hemispheric-dir").css("display","none");  
+  }
+});
+
+
+$("#specular-type-select").on('change',function(){
+  specularType = specularTypeDict[this.value];
+  if(this.value){
+    $("#spec-shine-div").css("display","block");
+  }
+  else{
+    $("#spec-shine-div").css("display","none");  
+  }
+});
+
+
 

@@ -12,10 +12,6 @@
     return;
   }
 
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  gl.clearColor(0.85, 0.85, 0.85, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.enable(gl.DEPTH_TEST);
 
 
   // Create and link the first group of shader
@@ -80,11 +76,11 @@
   centroids.forEach((element, index) => {
     centroid_items[index] = new Item([element[0], element[1], element[2]], "centroid");
   });
+
   min = new Array(3);
   max = new Array(3);
   min.fill(+Infinity);
   max.fill(0);
-
 
   utils.showCanvas();
 
@@ -96,7 +92,7 @@
   diamond = new OBJ.Mesh(diamondObjStr);
   models = { 'Cube': cube, 'Sphere': sphere };
 
-
+  // get all the attribute location for each program
   gl.useProgram(programs[0]);
   programs[0].positionAttributeLocation = gl.getAttribLocation(programs[0], "inPosition");
   programs[0].normalAttributeLocation = gl.getAttribLocation(programs[0], "inNormal");
@@ -142,17 +138,16 @@
   programs[2].textLocation=gl.getUniformLocation(programs[2],'u_texture');
 
 
-
+  //compute eprspective matrix
   perspectiveMatrix = utils.MakePerspective(90, gl.canvas.width / gl.canvas.height, 0.1, 1000);
 
 
-
+  //create all the vertex array objects
   createVaoObjects(programs[0], "Sphere", vertices = sphere.vertices, normals = sphere.vertexNormals, indices = sphere.indices, uv = sphere.textures);
   createVaoObjects(programs[0], "Cube", vertices = cube.vertices, normals = cube.vertexNormals, indices = cube.indices, uv = cube.textures);
   createVaoObjects(programs[1], "Lines", lines_position);
   var positions = setGeometry(500);
   createVaoObjects(programs[2], "Skybox", vertices = positions);
-  
   pyramid = buildPyramid();
   createVaoObjects(programs[1], "Pyramid", vertices = pyramid.vertices, normals = undefined, indices = pyramid.indices);
   listOfPossibleModels = Object.keys(vao);
@@ -163,148 +158,6 @@
 
 }(window))
 
-
-
-function createVaoObjects(program, nameObject, vertices, normals = undefined, indices = undefined, uv = undefined) {
-  gl.useProgram(program);
-  vao[nameObject] = gl.createVertexArray();
-  gl.bindVertexArray(vao[nameObject]);
-
-  // position
-  var positionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(program.positionAttributeLocation);
-  gl.vertexAttribPointer(program.positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(program.positionAttributeLocation);
-
-  if (!(normals == undefined)) {
-    //normals
-    var normalBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(programs[0].normalAttributeLocation);
-    gl.vertexAttribPointer(programs[0].normalAttributeLocation, 3, gl.FLOAT, false, 0, 0);
-
-  }
-
-  if (!(indices == undefined)) {
-    var indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-  }
-  if (!(uv == undefined)) {
-    var uvBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uv), gl.STATIC_DRAW); // the uv coordinates are in the cubeDefintion files
-    gl.enableVertexAttribArray(programs[0].uvAttributeLocation);
-    gl.vertexAttribPointer(programs[0].uvAttributeLocation, 2, gl.FLOAT, false, 0, 0); // 2 values for each coordinate...
-  }
-
-  gl.bindVertexArray(null);
-}
-
-
-
-// OBJECTS CLASSES
-class Item {
-  constructor([x, y, z], clas) {
-    this.class = clas;
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.rotX = Math.floor(Math.random() * (360 - 0 + 1) + 0);
-    this.rotY = Math.floor(Math.random() * (360 - 0 + 1) + 0);
-    this.rotZ = Math.floor(Math.random() * (360 - 0 + 1) + 0);
-    this.initialQuaternion = Quaternion.fromEuler(utils.degToRad(this.rotZ), utils.degToRad(this.rotX), utils.degToRad(this.rotY)); // default order is ZYX
-    this.worldM = utils.MakeWorld(this.x * MULTIPLICATIVE_FACTOR, this.y * MULTIPLICATIVE_FACTOR, this.z * MULTIPLICATIVE_FACTOR, this.rotX, this.rotY, this.rotZ, RADIUS);
-    this.display = true;
-  }
-
-  get_display() {
-    return this.display;
-  }
-
-  set_display(val) {
-    this.display = val;
-  }
-
-  set_rotX(x) {
-    this.rotX = x;
-  }
-  set_rotY(y) {
-    this.rotY = y;
-  }
-  set_rotZ(z) {
-    this.rotZ = z;
-  }
-
-  set_pos(worldMatrix) {
-    this.worldM = worldMatrix;
-  }
-  set_x(x) {
-    this.x = x;
-  }
-  set_y(y) {
-    this.y = y;
-  }
-  set_z(z) {
-    this.z = z;
-  }
-
-  get_x() {
-    return this.x;
-  }
-
-  get_y() {
-    return this.y;
-  }
-
-  get_z() {
-    return this.z;
-  }
-
-  get_worldMatrix() {
-    return this.worldM;
-  }
-  get_quaternion() {
-    return this.initialQuaternion;
-  }
-
-  pos() {
-    return [this.worldM[3], this.worldM[7], this.worldM[11]];
-  }
-}
-
-function animate_pca() {
-  if (!time) {
-    initializeControlPoint();
-  }
-  var quadratic;
-  var point;
-  for (var i = 0; i < selected_element.length; i++) {
-    point = bezier.quadraticBezier([dataset_pca[i][0], dataset_pca[i][1], dataset_pca[i][2]], control_quadratic_points[i], [adjusted_data_x[i], adjusted_data_y[i], 0.0], time / maxT);
-    rotation = QuaternionToEuler(items[selected_element[i]].get_quaternion().slerp(Quaternion.fromEuler(utils.degToRad(45), 0, 0, order = "XYZ"))(time / maxT));
-    items[selected_element[i]].set_pos(utils.MakeWorld(point.x * MULTIPLICATIVE_FACTOR, point.y * MULTIPLICATIVE_FACTOR, point.z * MULTIPLICATIVE_FACTOR, utils.radToDeg(rotation[0]), utils.radToDeg(rotation[1]), utils.radToDeg(rotation[2]), RADIUS));
-    items[selected_element[i]].set_x(point.x);
-    items[selected_element[i]].set_y(point.y);
-    items[selected_element[i]].set_z(point.z);
-    items[selected_element[i]].set_rotX(utils.radToDeg(rotation[0]));
-    items[selected_element[i]].set_rotY(utils.radToDeg(rotation[1]));
-    items[selected_element[i]].set_rotZ(utils.radToDeg(rotation[2]));
-  }
-  time += VELOCITY_PCA;
-  if (time >= maxT) {
-    time = 0;
-    pca = !pca;
-    element = document.getElementById('P');
-    if (element) {
-      element.style.backgroundColor = color_button;
-    }
-  }
-}
-
-
 var updateScene = function () {
   stats.begin();
   drawScene();
@@ -312,23 +165,18 @@ var updateScene = function () {
   window.requestAnimationFrame(updateScene);
 };
 
-function resize(canvas) {
-  // Lookup the size the browser is displaying the canvas.
-  var displayWidth = canvas.clientWidth;
-  var displayHeight = canvas.clientHeight;
-
-  // Check if the canvas is not the same size.
-  if (canvas.width != displayWidth ||
-    canvas.height != displayHeight) {
-
-    // Make the canvas the same size
-    canvas.width = displayWidth;
-    canvas.height = displayHeight;
-  }
-}
-
 
 function drawScene() {
+
+  resize(gl.canvas);
+  gl.clearColor(0.85, 0.85, 0.85, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
+  gl.enable(gl.CULL_FACE);
+  gl.enable(gl.POLYGON_OFFSET_FILL);
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  computeViewMatrix();
+  showAxes();
 
   if (pca && !kmeans) {
     animate_pca();
@@ -340,7 +188,6 @@ function drawScene() {
     else {
       last_centroid = ObjKMeans.centroids;
       new_values = ObjKMeans.performSteps();
-
       count_frames = 0;
     }
   }
@@ -365,15 +212,6 @@ function drawScene() {
     }
 
   }
-  resize(gl.canvas);
-  gl.clearColor(0.85, 0.85, 0.85, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.enable(gl.DEPTH_TEST);
-  gl.enable(gl.CULL_FACE);
-  gl.enable(gl.POLYGON_OFFSET_FILL);
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  computeViewMatrix();
-  showAxes();
   gl.useProgram(programs[0]);
 
   if (new_values !== undefined) {
@@ -552,6 +390,117 @@ function drawScene() {
 
 
 
+function animate_pca() {
+  if (!time) {
+    initializeControlPoint();
+  }
+  var quadratic;
+  var point;
+  for (var i = 0; i < selected_element.length; i++) {
+    point = bezier.quadraticBezier([dataset_pca[i][0], dataset_pca[i][1], dataset_pca[i][2]], control_quadratic_points[i], [adjusted_data_x[i], adjusted_data_y[i], 0.0], time / maxT);
+    rotation = QuaternionToEuler(items[selected_element[i]].get_quaternion().slerp(Quaternion.fromEuler(utils.degToRad(45), 0, 0, order = "XYZ"))(time / maxT));
+    items[selected_element[i]].set_pos(utils.MakeWorld(point.x * MULTIPLICATIVE_FACTOR, point.y * MULTIPLICATIVE_FACTOR, point.z * MULTIPLICATIVE_FACTOR, utils.radToDeg(rotation[0]), utils.radToDeg(rotation[1]), utils.radToDeg(rotation[2]), RADIUS));
+    items[selected_element[i]].set_x(point.x);
+    items[selected_element[i]].set_y(point.y);
+    items[selected_element[i]].set_z(point.z);
+    items[selected_element[i]].set_rotX(utils.radToDeg(rotation[0]));
+    items[selected_element[i]].set_rotY(utils.radToDeg(rotation[1]));
+    items[selected_element[i]].set_rotZ(utils.radToDeg(rotation[2]));
+  }
+  time += VELOCITY_PCA;
+  if (time >= maxT) {
+    time = 0;
+    pca = !pca;
+    element = document.getElementById('P');
+    if (element) {
+      element.style.backgroundColor = color_button;
+    }
+  }
+}
+
+
+
+window.addEventListener('keyup', callbacks.onkeyUp, false);
+window.addEventListener('keydown', callbacks.onKeyDown, false);
+window.addEventListener('mouseup', onMouseUp, false);
+
+
+
+
+
+
+// OBJECTS CLASSES
+class Item {
+  constructor([x, y, z], clas) {
+    this.class = clas;
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.rotX = Math.floor(Math.random() * (360 - 0 + 1) + 0);
+    this.rotY = Math.floor(Math.random() * (360 - 0 + 1) + 0);
+    this.rotZ = Math.floor(Math.random() * (360 - 0 + 1) + 0);
+    this.initialQuaternion = Quaternion.fromEuler(utils.degToRad(this.rotZ), utils.degToRad(this.rotX), utils.degToRad(this.rotY)); // default order is ZYX
+    this.worldM = utils.MakeWorld(this.x * MULTIPLICATIVE_FACTOR, this.y * MULTIPLICATIVE_FACTOR, this.z * MULTIPLICATIVE_FACTOR, this.rotX, this.rotY, this.rotZ, RADIUS);
+    this.display = true;
+  }
+
+  get_display() {
+    return this.display;
+  }
+
+  set_display(val) {
+    this.display = val;
+  }
+
+  set_rotX(x) {
+    this.rotX = x;
+  }
+  set_rotY(y) {
+    this.rotY = y;
+  }
+  set_rotZ(z) {
+    this.rotZ = z;
+  }
+
+  set_pos(worldMatrix) {
+    this.worldM = worldMatrix;
+  }
+  set_x(x) {
+    this.x = x;
+  }
+  set_y(y) {
+    this.y = y;
+  }
+  set_z(z) {
+    this.z = z;
+  }
+
+  get_x() {
+    return this.x;
+  }
+
+  get_y() {
+    return this.y;
+  }
+
+  get_z() {
+    return this.z;
+  }
+
+  get_worldMatrix() {
+    return this.worldM;
+  }
+  get_quaternion() {
+    return this.initialQuaternion;
+  }
+
+  pos() {
+    return [this.worldM[3], this.worldM[7], this.worldM[11]];
+  }
+}
+
+
+
 
 
 
@@ -602,12 +551,6 @@ function computeViewMatrix() {
 }
 
 
-
-window.addEventListener('keyup', callbacks.onkeyUp, false);
-window.addEventListener('keydown', callbacks.onKeyDown, false);
-window.addEventListener('mouseup', onMouseUp, false);
-
-
 function createUiModelClass() {
   classes.forEach((i) => {
     $('#model-class').append(`<div class="row d-flex justify-content-center">
@@ -652,13 +595,12 @@ function showAxes() {
   var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
   var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
   gl.uniformMatrix4fv(programs[1].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
-  gl.uniformMatrix3fv(programs[1].color_axes, gl.FALSE, colorAxes);
+  gl.uniform4fv(programs[1].color_axes, colorAxes);
   gl.bindVertexArray(vao['Lines']);
   gl.drawArrays(gl.LINES, 0, 6);
   if (showNegativeAxes) {
     gl.drawArrays(gl.LINES, 6, 6);
   }
-
   showPyramid(1);
   if (showNegativeAxes) {
     showPyramid(-1);
@@ -688,55 +630,64 @@ function showPyramid(negative_axes) {
     var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
     var projectionMatrix = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
     gl.uniformMatrix4fv(programs[1].matrixLocation, gl.FALSE, utils.transposeMatrix(projectionMatrix));
-    gl.uniformMatrix3fv(programs[1].color_axes, gl.FALSE, colorAxes);
+    gl.uniform4fv(programs[1].color_axes, colorAxes);
     gl.drawElements(gl.TRIANGLES, pyramid.indices.length, gl.UNSIGNED_SHORT, 0);
   }
 }
 
 
-function ambientTypeSelection() {
-  var type = document.getElementById("ambient-type-select").value;
-  ambientType = ambientTypeDict[type];
-  if (type == 2) {
-    document.getElementById("hemispheric-dir").style.display = "block";
-  }
-  else {
-    document.getElementById("hemispheric-dir").style.display = "none";
-  }
-}
-function diffuseTypeSelection() {
-  var type = document.getElementById("diffuse-type-select").value;
-  diffuseType = diffuseTypeDict[type];
+function createVaoObjects(program, nameObject, vertices, normals = undefined, indices = undefined, uv = undefined) {
+  gl.useProgram(program);
+  vao[nameObject] = gl.createVertexArray();
+  gl.bindVertexArray(vao[nameObject]);
 
-}
-function lightTypeSelection() {
-  var type = document.getElementById("light-type-select").value;
-  dirLightType = dirLightTypeDict[type];
-  if (type == 0) {
-    document.getElementById("direct").style.display = "block";
-    document.getElementById("point").style.display = "none";
-    document.getElementById("cone").style.display = "none";
+  // position
+  var positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(program.positionAttributeLocation);
+  gl.vertexAttribPointer(program.positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(program.positionAttributeLocation);
+
+  if (!(normals == undefined)) {
+    //normals
+    var normalBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(programs[0].normalAttributeLocation);
+    gl.vertexAttribPointer(programs[0].normalAttributeLocation, 3, gl.FLOAT, false, 0, 0);
+
   }
-  else if (type == 1) {
-    document.getElementById("point").style.display = "block";
-    document.getElementById("direct").style.display = "none";
-    document.getElementById("cone").style.display = "none";
+
+  if (!(indices == undefined)) {
+    var indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
   }
-  else {
-    document.getElementById("point").style.display = "block";
-    document.getElementById("direct").style.display = "block";
-    document.getElementById("cone").style.display = "block";
+  if (!(uv == undefined)) {
+    var uvBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uv), gl.STATIC_DRAW); // the uv coordinates are in the cubeDefintion files
+    gl.enableVertexAttribArray(programs[0].uvAttributeLocation);
+    gl.vertexAttribPointer(programs[0].uvAttributeLocation, 2, gl.FLOAT, false, 0, 0); // 2 values for each coordinate...
   }
+
+  gl.bindVertexArray(null);
 }
 
-function specularTypeSelection() {
-  var type = document.getElementById("specular-type-select").value;
-  specularType = specularTypeDict[type];
-  if (type != 0) {
-    document.getElementById("spec-shine-div").style.display = "block";
-  }
-  else {
-    document.getElementById("spec-shine-div").style.display = "none";
+
+function resize(canvas) {
+  // Lookup the size the browser is displaying the canvas.
+  var displayWidth = canvas.clientWidth;
+  var displayHeight = canvas.clientHeight;
+
+  // Check if the canvas is not the same size.
+  if (canvas.width != displayWidth ||
+    canvas.height != displayHeight) {
+
+    // Make the canvas the same size
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
   }
 }
 
@@ -758,33 +709,6 @@ function updatePalette(event) {
   var id = parseInt(event.target.id[event.target.id.length - 1]);
   colorDiffuseClass[id] = normalizeColor([hexToRgb(newValue).r, hexToRgb(newValue).g, hexToRgb(newValue).b]);
 }
-
-
-var bezier = {
-  linear: (p0, p1, t) => {
-    var pFinal = {};
-    pFinal.x = (1 - t) * p0[0] + t * p1[0];
-    pFinal.y = (1 - t) * p0[1] + t * p1[1];
-    pFinal.z = (1 - t) * p0[2] + t * p1[2];
-    return pFinal;
-  },
-  quadraticBezier: (p0, p1, p2, t) => {
-    var pFinal = {};
-    pFinal.x = Math.pow(1 - t, 2) * p0[0] + (1 - t) * 2 * t * p1[0] + Math.pow(t, 2) * p2[0];
-    pFinal.y = Math.pow(1 - t, 2) * p0[1] + (1 - t) * 2 * t * p1[1] + Math.pow(t, 2) * p2[1];
-    pFinal.z = Math.pow(1 - t, 2) * p0[2] + (1 - t) * 2 * t * p1[2] + Math.pow(t, 2) * p2[2];
-    return pFinal;
-
-  },
-  cubicBezier: (p0, p1, p2, p3, t) => {
-    var pFinal = {};
-    pFinal.x = Math.pow(1 - t, 3) * pO[0] + (1 - t) * 3 * t * p1[0] + (1 - t) * 3 * t * t * p2[0] + Math.pow(t, 3) * p3[0];
-    pFinal.y = Math.pow(1 - t, 3) * pO[1] + (1 - t) * 3 * t * p1[1] + (1 - t) * 3 * t * t * p2[1] + Math.pow(t, 3) * p3[1];
-    pFinal.z = Math.pow(1 - t, 3) * pO[2] + (1 - t) * 3 * t * p1[2] + (1 - t) * 3 * t * t * p2[2] + Math.pow(t, 3) * p3[2];
-    return pFinal;
-  }
-}
-
 
 function initializeControlPoint() {
   dataset_pca.forEach((element, index) => {

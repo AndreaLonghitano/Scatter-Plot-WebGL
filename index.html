@@ -108,21 +108,14 @@
 
     <hr />
     <div class="row">
-      <div class="col-2 offset-1 justify-content-center">
-        <button type="button" class="btn btn-light" id="K">K-means</button>
+      <div class="col-6 d-flex justify-content-center">
+        <button type="button" class="btn btn-light" id="K">K</button>
+      </div>
+      <div class="col-6 command">
+        k-means
       </div>
 
-      <div class="col-6 offset-2 justify-content-center">
-        <select class="mdb-select md-form" style="background-color: azure;" id="distance_selection">
-              <option value="0">Euclidean</option>
-              <option value="1">Manhattan</option>
-              <option value="2">Min</option>
-              <option value="3">Max</option>
-              <option value="4">Euclidean Square</option>
-            </select>
-      </div>
     </div>
-    <br/>
     <hr />
     <div class="row">
       <div id="model-class">
@@ -136,8 +129,7 @@
       </div>
 
       <div class="col-7 offset-1 justify-content-center">
-        <select class="mdb-select md-form" style="background-color: azure;" id="light-type-select"
-          onchange="lightTypeSelection()">
+        <select class="mdb-select md-form" style="background-color: azure;" id="light-type-select">
           <option value="0">Direct</option>
           <option value="1">Point</option>
           <option value="2">Spot</option>
@@ -165,38 +157,6 @@
         </div>
       </div>
 
-
-
-
-
-    <!--
-    <section class="demo">
-      <div class='col-4'>
-        <div class="row d-flex justify-content-center">
-          <div class="col-3 offset-1 justify-content-center">
-            <label for="class">Light</label>
-          </div>
-          <div class="col-7 offset-1 justify-content-center">
-            <select class="mdb-select md-form" style="background-color: azure;" id="light-type-select"
-              onchange="lightTypeSelection()">
-              <option value="0">Direct</option>
-              <option value="1">Point</option>
-              <option value="2">Spot</option>
-            </select>
-          </div>
-        </div>
-        <div id="direct" style="display:block;">
-          &theta; <input type="range" class="custom-range" min="0" max="180" step="1" value ="90" id="alfa_light"><br />
-          &phi; <input type="range" class="custom-range" min="-180" max="180" step="1" value ="0" id="beta_light"></div>
-        <div id="point" style="display:none;">
-          pos x <input type="range" class="custom-range" min="-250" max="250" step="1" id="x_light"><br />
-          pos y <input type="range" class="custom-range" min="-250" max="250" step="1" id="y_light"><br />
-          pos z <input type="range" class="custom-range" min="-250" max="250" step="1" id="z_light"></div>
-          <div id="cone" style="display:none;">
-            ConeOut <input type="range" class="custom-range" min="0" max="150" id="cone_out"><br />
-            ConeIn <input type="range" class="custom-range" min="0" max="100" id="cone_in"></div>
-    </section>
-    -->
     <hr>
 
     <div class="row d-flex justify-content-center">
@@ -204,8 +164,7 @@
       <label for="class">Diffuse</label>
       </div>
       <div class="col-7 offset-1 justify-content-center">
-        <select class="mdb-select md-form" style="background-color: azure;" id="diffuse-type-select"
-          onchange="diffuseTypeSelection()">
+        <select class="mdb-select md-form" style="background-color: azure;" id="diffuse-type-select">
           <option value="0">Lambert</option>
           <option value="1">Oren-Nayar</option>
         </select>
@@ -220,8 +179,7 @@
       </div>
 
       <div class="col-7 offset-1 justify-content-center">
-        <select class="mdb-select md-form" style="background-color: azure;" id="ambient-type-select"
-          onchange="ambientTypeSelection()">
+        <select class="mdb-select md-form" style="background-color: azure;" id="ambient-type-select">
           <option value="0">None</option>
           <option value="1" selected>Ambient</option>
           <option value="2">Hemispheric</option>
@@ -232,27 +190,6 @@
         &phi; <input type="range" class="custom-range" min="-180" max="180" step="1" value ="0" id="beta_ambient"></div>
       </div>
   
-      <!--
-    <section class="demo">
-      <div class='col-4'>
-        <div class="row d-flex justify-content-center">
-          <div class="col-3 offset-1 justify-content-center">
-            <label for="class">Ambient</label>
-          </div>
-          <div class="col-7 offset-1 justify-content-center">
-            <select class="mdb-select md-form" style="background-color: azure;" id="ambient-type-select"
-              onchange="ambientTypeSelection()">
-              <option value="0">None</option>
-              <option value="1" selected>Ambient</option>
-              <option value="2">Hemispheric</option>
-            </select>
-          </div>
-        </div>
-        <div id="hemispheric-dir" style="display:none;">
-          &theta; <input type="range" class="custom-range" min="0" max="180" step="1" value="90" id="alfa_ambient"><br /> <br />
-          &phi; <input type="range" class="custom-range" min="-180" max="180" step="1" value ="0" id="beta_ambient"></div>
-</section>
--->
 <hr>
 <div class="row d-flex justify-content-center">
   <div class="col-3 offset-1 justify-content-center">
