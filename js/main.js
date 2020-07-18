@@ -250,35 +250,7 @@ function drawScene() {
       gl.uniformMatrix4fv(programs[0].perspectiveLocation, gl.FALSE, utils.transposeMatrix(perspectiveMatrix));
       gl.uniformMatrix4fv(programs[0].worldViewLocation, gl.FALSE, utils.transposeMatrix(worldViewMatrix));
 
-      var colorCentroid = centroid_colors[i];
-      gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
-      gl.uniform3fv(programs[0].materialDiffColorHandle, colorCentroid);
-      gl.uniform3fv(programs[0].lightColorHandle, directionalLightColor);
-      gl.uniform3fv(programs[0].lightDirectionHandle, directionalLightTrasformed);
-      gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
-      gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
-      gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
-      gl.uniform1f(programs[0].lightConeOutHandle, lightConeOut);
-      gl.uniform1f(programs[0].lightConeInHandle, lightConeIn);
-      gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
-      gl.uniform3fv(programs[0].AmbientLightColHandle, ambientLightColor);
-      gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
-      gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
-      gl.uniform3fv(programs[0].AmbientMatColHandle, colorCentroid);
-      gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
-      gl.uniform3fv(programs[0].MatEmisColHandle, colorCentroid);
-      gl.uniform4fv(programs[0].specularTypehandle, specularType);
-      gl.uniform1f(programs[0].specShineHandle, SpecShine);
-      gl.uniform3fv(programs[0].specularColorHandle, specularColor);
-      gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-
-      //fog
-      gl.uniform1i(programs[0].enableFog, enable_fog);
-      gl.uniform1f(programs[0].fogFar,200.0);
-      gl.uniform1f(programs[0].fogNear,0.0)
-      gl.uniform4fv(programs[0].fogColor,fogColor);
-
-
+      setUniformObjects(worldViewMatrix,centroid_colors[i],eyePosTransformed,lightPosTransformed,directionalLightTrasformed,ambientLightDirTransformed,true)
 
       gl.bindVertexArray(vao[shape]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[shape].indices.length, gl.UNSIGNED_SHORT, 0);
@@ -305,44 +277,8 @@ function drawScene() {
       }
       var color = i == object_selected ? cubeMaterialColor : final_color;
 
-      gl.uniformMatrix4fv(programs[0].perspectiveLocation, gl.FALSE, utils.transposeMatrix(perspectiveMatrix));
-      gl.uniformMatrix4fv(programs[0].worldViewLocation, gl.FALSE, utils.transposeMatrix(worldViewMatrix));
+      setUniformObjects(worldViewMatrix,color,eyePosTransformed,lightPosTransformed,directionalLightTrasformed,ambientLightDirTransformed,false)
 
-
-      gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
-      gl.uniform3fv(programs[0].materialDiffColorHandle, color);
-      gl.uniform3fv(programs[0].lightColorHandle, directionalLightColor);
-      gl.uniform3fv(programs[0].lightDirectionHandle, directionalLightTrasformed);
-      gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
-      gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
-      gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
-      gl.uniform1f(programs[0].lightConeOutHandle, lightConeOut);
-      gl.uniform1f(programs[0].lightConeInHandle, lightConeIn);
-      gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
-      gl.uniform3fv(programs[0].AmbientLightColHandle, ambientLightColor);
-      gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
-      gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
-      gl.uniform3fv(programs[0].AmbientMatColHandle, color);
-      gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
-      gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
-      gl.uniform4fv(programs[0].specularTypehandle, specularType);
-      gl.uniform1f(programs[0].specShineHandle, SpecShine);
-      gl.uniform3fv(programs[0].specularColorHandle, specularColor);
-      gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-      gl.uniform1i(programs[0].textLocation,0); 
-      gl.uniform1i(programs[0].normalMapHandle,1);
-      gl.uniform1i(programs[0].heightMapHandle,2);
-      gl.uniform1f(programs[0].textureMixHandle, textureMix);
-      gl.uniform1i(programs[0].textEnableHandle, textEnable);
-      gl.uniform1i(programs[0].nMapEnableHandle, nMapEnable);
-      gl.uniform1i(programs[0].pMapEnableHandle, pMapEnable);
-
-      //fog 
-      //fog
-      gl.uniform1i(programs[0].enableFog, enable_fog);
-      gl.uniform1f(programs[0].fogFar,200.0);
-      gl.uniform1f(programs[0].fogNear,0.0)
-      gl.uniform4fv(programs[0].fogColor,fogColor);
 
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
@@ -353,17 +289,14 @@ function drawScene() {
 
   else {
     for (i = 0; i < dataset.length; i++) {
-
       if (dataset[i].x < (min_x + (x_range.valueLow * (max_x - min_x) / 100)) || dataset[i].x > (max_x - (1 - x_range.valueHigh / 100) * (max_x - min_x)) ||
         dataset[i].y < (min_y + (y_range.valueLow * (max_y - min_y) / 100)) || dataset[i].y > (max_y - (1 - y_range.valueHigh / 100) * (max_y - min_y)) ||
         dataset[i].z < (min_z + (z_range.valueLow * (max_z - min_z) / 100)) || dataset[i].z > (max_z - (1 - z_range.valueHigh / 100) * (max_z - min_z))) {
         items[i].set_display(false);
         continue;
       }
-
       var objSelected = $('#class' + dataset[i].class).val();
       var ele = listOfPossibleModels[objSelected];
-
       var worldMatrix = items[i].worldM;
       var worldViewMatrix = utils.multiplyMatrices(viewMatrix, worldMatrix);
       var eyePosTransformed = utils.multiplyMatrixVector(utils.invertMatrix(worldMatrix), [cx, cy, cz, 1.0]);
@@ -371,47 +304,9 @@ function drawScene() {
       var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(worldMatrix));
       var directionalLightTrasformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, directionalLight));
       var ambientLightDirTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix, ambientLightDir));
-
-      gl.uniformMatrix4fv(programs[0].perspectiveLocation, gl.FALSE, utils.transposeMatrix(perspectiveMatrix));
-      gl.uniformMatrix4fv(programs[0].worldViewLocation, gl.FALSE, utils.transposeMatrix(worldViewMatrix));
-
-
       var color = i == object_selected ? cubeMaterialColor : colorDiffuseClass[dataset[i].class];
 
-      gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
-      gl.uniform3fv(programs[0].materialDiffColorHandle, color);
-      gl.uniform3fv(programs[0].lightColorHandle, directionalLightColor);
-      gl.uniform3fv(programs[0].lightDirectionHandle, directionalLightTrasformed);
-      gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
-      gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
-      gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
-      gl.uniform1f(programs[0].lightConeOutHandle, lightConeOut);
-      gl.uniform1f(programs[0].lightConeInHandle, lightConeIn);
-      gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
-      gl.uniform3fv(programs[0].AmbientLightColHandle, ambientLightColor);
-      gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
-      gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
-      gl.uniform3fv(programs[0].AmbientMatColHandle, color);
-      gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
-      gl.uniform3fv(programs[0].MatEmisColHandle, materialEmissionColor);
-      gl.uniform4fv(programs[0].specularTypehandle, specularType);
-      gl.uniform1f(programs[0].specShineHandle, SpecShine);
-      gl.uniform3fv(programs[0].specularColorHandle, specularColor);
-      gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
-      //texture
-      gl.uniform1f(programs[0].textureMixHandle, textureMix);
-      gl.uniform1i(programs[0].textLocation,0); 
-      gl.uniform1i(programs[0].normalMapHandle,1);
-      gl.uniform1i(programs[0].heightMapHandle,2);
-      gl.uniform1i(programs[0].textEnableHandle, textEnable);
-      gl.uniform1i(programs[0].nMapEnableHandle, nMapEnable);
-      gl.uniform1i(programs[0].pMapEnableHandle, pMapEnable);
-
-      //fog
-      gl.uniform1i(programs[0].enableFog, enable_fog);
-      gl.uniform1f(programs[0].fogFar,200.0);
-      gl.uniform1f(programs[0].fogNear,0.0)
-      gl.uniform4fv(programs[0].fogColor,fogColor);
+      setUniformObjects(worldViewMatrix,color,eyePosTransformed,lightPosTransformed,directionalLightTrasformed,ambientLightDirTransformed,false);
 
       gl.bindVertexArray(vao[ele]); // va bene metterlo qui prima di diseganre
       gl.drawElements(gl.TRIANGLES, models[ele].indices.length, gl.UNSIGNED_SHORT, 0);
@@ -431,6 +326,46 @@ function drawScene() {
   gl.uniform4fv(programs[2].fogColor,fogColor);
   gl.uniform1i(programs[2].textLocation,3);
   gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
+}
+
+
+function setUniformObjects(worldViewMatrix,color,eyePosTransformed,lightPosTransformed,directionalLightTrasformed,ambientLightDirTransformed,centroid=false){
+      gl.uniformMatrix4fv(programs[0].perspectiveLocation, gl.FALSE, utils.transposeMatrix(perspectiveMatrix));
+      gl.uniformMatrix4fv(programs[0].worldViewLocation, gl.FALSE, utils.transposeMatrix(worldViewMatrix));
+      gl.uniform4fv(programs[0].diffuseTypeHandle, diffuseType);
+      gl.uniform3fv(programs[0].materialDiffColorHandle, color);
+      gl.uniform3fv(programs[0].lightColorHandle, directionalLightColor);
+      gl.uniform3fv(programs[0].lightDirectionHandle, directionalLightTrasformed);
+      gl.uniform4fv(programs[0].lightPosHandle, lightPosTransformed);
+      gl.uniform1f(programs[0].lightDecayHandle, lightDecay);
+      gl.uniform1f(programs[0].lightTargetHandle, lightTarget);
+      gl.uniform1f(programs[0].lightConeOutHandle, lightConeOut);
+      gl.uniform1f(programs[0].lightConeInHandle, lightConeIn);
+      gl.uniform4fv(programs[0].lightTypeHandle, dirLightType);
+      gl.uniform3fv(programs[0].AmbientLightColHandle, ambientLightColor);
+      gl.uniform3fv(programs[0].AmbientLightLowColHandle, ambientLightLowColor);
+      gl.uniform3fv(programs[0].AmbienttDirHandle, ambientLightDirTransformed);
+      gl.uniform3fv(programs[0].AmbientMatColHandle, color);
+      gl.uniform4fv(programs[0].AmbientTypeHandle, ambientType);
+      gl.uniform3fv(programs[0].MatEmisColHandle, centroid ? color:materialEmissionColor);
+      gl.uniform4fv(programs[0].specularTypehandle, specularType);
+      gl.uniform1f(programs[0].specShineHandle, SpecShine);
+      gl.uniform3fv(programs[0].specularColorHandle, specularColor);
+      gl.uniform4fv(programs[0].eyePosUniform, eyePosTransformed);
+      //texture
+      gl.uniform1f(programs[0].textureMixHandle, textureMix);
+      gl.uniform1i(programs[0].textLocation,0); 
+      gl.uniform1i(programs[0].normalMapHandle,1);
+      gl.uniform1i(programs[0].heightMapHandle,2);
+      gl.uniform1i(programs[0].textEnableHandle, textEnable);
+      gl.uniform1i(programs[0].nMapEnableHandle, nMapEnable);
+      gl.uniform1i(programs[0].pMapEnableHandle, pMapEnable);
+
+      //fog
+      gl.uniform1i(programs[0].enableFog, enable_fog);
+      gl.uniform1f(programs[0].fogFar,200.0);
+      gl.uniform1f(programs[0].fogNear,0.0)
+      gl.uniform4fv(programs[0].fogColor,fogColor);
 }
 
 

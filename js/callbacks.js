@@ -157,7 +157,7 @@ var callbacks={
                //k-means
                case KEY_CODE.K:
                  // once you run kmeans you cannot stop it
-                 if(!kmeans){
+                 if(!kmeans && !pca){
                   kmeans=!kmeans;
                   if(!($('#x_range').prop('disabled'))){
                     $(".multirange").prop('disabled', true);
