@@ -96,62 +96,22 @@
   gl.useProgram(programs[0]);
   programs[0].positionAttributeLocation = gl.getAttribLocation(programs[0], "inPosition");
   programs[0].normalAttributeLocation = gl.getAttribLocation(programs[0], "inNormal");
-  programs[0].perspectiveLocation = gl.getUniformLocation(programs[0], "perspective");
-  programs[0].worldViewLocation = gl.getUniformLocation(programs[0], "ModelView");
-  programs[0].materialDiffColorHandle = gl.getUniformLocation(programs[0], 'mDiffColor');
-  programs[0].diffuseTypeHandle = gl.getUniformLocation(programs[0], "diffuseType");
-  programs[0].lightDirectionHandle = gl.getUniformLocation(programs[0], 'L1_lightDirection');
-  programs[0].lightColorHandle = gl.getUniformLocation(programs[0], 'L1_lightColor');
-  programs[0].lightPosHandle = gl.getUniformLocation(programs[0], "L1_Pos");
-  programs[0].lightDecayHandle = gl.getUniformLocation(programs[0], "L1_Decay");
-  programs[0].lightTargetHandle = gl.getUniformLocation(programs[0], "L1_Target");
-  programs[0].lightConeOutHandle = gl.getUniformLocation(programs[0], "L1_ConeOut");
-  programs[0].lightConeInHandle = gl.getUniformLocation(programs[0], "L1_ConeIn");
-  programs[0].lightTypeHandle = gl.getUniformLocation(programs[0], "lightType");
-  programs[0].AmbientMatColHandle = gl.getUniformLocation(programs[0], "ambientMatColor");
-  programs[0].AmbientLightColHandle = gl.getUniformLocation(programs[0], "ambientLightColor");
-  programs[0].AmbientLightLowColHandle = gl.getUniformLocation(programs[0], "ambientLightLowColor");
-  programs[0].AmbienttDirHandle = gl.getUniformLocation(programs[0], "ambientDir");
-  programs[0].AmbientTypeHandle = gl.getUniformLocation(programs[0], "ambientType");
-  programs[0].MatEmisColHandle = gl.getUniformLocation(programs[0], "emitColor");
-  programs[0].specularTypehandle = gl.getUniformLocation(programs[0], "specularType");
-  programs[0].specShineHandle = gl.getUniformLocation(programs[0], "SpecShine");
-  programs[0].specularColorHandle = gl.getUniformLocation(programs[0], "specCol");
-  programs[0].lightDirMatrixPositionHandle = gl.getUniformLocation(programs[0], 'lightDirMatrix');
-  programs[0].eyePosHandler = gl.getUniformLocation(programs[0], "eyePos");
   programs[0].uvAttributeLocation = gl.getAttribLocation(programs[0], "a_uv");
-  programs[0].textLocation = gl.getUniformLocation(programs[0], "u_texture");
-  programs[0].textureMixHandle = gl.getUniformLocation(programs[0], "texture_mix");
-  programs[0].normalMapHandle = gl.getUniformLocation(programs[0], "normalMap");
-  programs[0].heightMapHandle = gl.getUniformLocation(programs[0], "depthMap");
-  programs[0].textEnableHandle = gl.getUniformLocation(programs[0], "enable_text");
-  programs[0].nMapEnableHandle = gl.getUniformLocation(programs[0], "enable_nMap");
-  programs[0].pMapEnableHandle = gl.getUniformLocation(programs[0], "enable_pMap");
-  
-
-  //fog
-  programs[0].enableFog=gl.getUniformLocation(programs[0], "enablefog");
-  programs[0].fogNear=gl.getUniformLocation(programs[0], "fogNear");
-  programs[0].fogFar=gl.getUniformLocation(programs[0], "fogFar");
-  programs[0].fogColor=gl.getUniformLocation(programs[0], "fogColor");
-
+  Object.keys(uniforms_zero).forEach((k)=>{
+    programs[0][k]=gl.getUniformLocation(programs[0],uniforms_zero[k]);
+  }) 
 
   gl.useProgram(programs[1]);
   programs[1].positionAttributeLocation = gl.getAttribLocation(programs[1], "inPosition");
   programs[1].matrixLocation = gl.getUniformLocation(programs[1], "matrix");
   programs[1].color_axes = gl.getUniformLocation(programs[1], "color_axes");
 
+  //environment
   gl.useProgram(programs[2]);
   programs[2].positionAttributeLocation = gl.getAttribLocation(programs[2], "a_position");
-  programs[2].perspectiveLocation = gl.getUniformLocation(programs[2], "perspective");
-  programs[2].ViewLocation = gl.getUniformLocation(programs[2], "View");
-  programs[2].textLocation=gl.getUniformLocation(programs[2],'u_texture');
-
-  //fog
-  programs[2].enableFog=gl.getUniformLocation(programs[2], "enablefog");
-  programs[2].fogNear=gl.getUniformLocation(programs[2], "fogNear");
-  programs[2].fogFar=gl.getUniformLocation(programs[2], "fogFar");
-  programs[2].fogColor=gl.getUniformLocation(programs[2], "fogColor");
+  Object.keys(uniforms_two).forEach((k)=>{
+    programs[2][k]=gl.getUniformLocation(programs[2],uniforms_two[k]);
+  }) 
 
 
   //compute eprspective matrix
