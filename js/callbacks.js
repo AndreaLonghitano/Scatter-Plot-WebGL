@@ -220,7 +220,6 @@ $("#y_light").on('input change',function(){
 
 $("#z_light").on('input change',function(){
   dirLightPos_z=this.value;
-  console.log(dirLightPos_z);
 });
 
 $("#alfa_light").on('input change',function(){
@@ -267,7 +266,7 @@ $("#pMapActive").click(()=>{
 
 $("#light-type-select").on('change',function(){
   dirLightType = dirLightTypeDict[this.value];
-  if (!this.value) {
+  if (this.value==0) {
     $("#direct").css("display","block");
     $("#point").css("display","none");
     $("#cone").css("display","none");
@@ -302,7 +301,7 @@ $("#ambient-type-select").on('change',function(){
 
 $("#specular-type-select").on('change',function(){
   specularType = specularTypeDict[this.value];
-  if(this.value){
+  if(this.value==1){
     $("#spec-shine-div").css("display","block");
   }
   else{

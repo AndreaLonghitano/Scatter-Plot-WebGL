@@ -116,8 +116,8 @@ var directionalLightColor = [1.0, 1.0, 1.0];
 var dirLightPos_x = 0.0;
 var dirLightPos_y = 0.0;
 var dirLightPos_z = 0.0;
-var lightConeOut = 30;
-var lightConeIn = 80;
+var lightConeOut = document.getElementById("cone_out").value/360*3.14;
+var lightConeIn = document.getElementById("cone_in").value/100;
 var lightDecay = 0;
 var lightTarget = 61;
 
@@ -160,7 +160,7 @@ var diffuseType = diffuseTypeDict[0];
 //Specular Light
 var specularTypeDict = {
   0: [0,0,0,0], //none
-  1: [1,0,0,0], //Blinn
+  1: [1,0,0,0] //Blinn
 }
 
 var specularType = specularTypeDict[0];

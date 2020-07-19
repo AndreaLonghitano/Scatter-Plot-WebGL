@@ -135,11 +135,9 @@ vec3 computeSpecularLight(vec3 eyeDir, vec3 lightDir, vec3 normalVector, vec3 li
   // Blinn
   vec3 blinnSpecular = vec3(pow(clamp(dot(normalize(eyeDir+lightDir), normalVector),0.0,1.0), SpecShine)) * lightColor;
 
-  //Phong
-  vec3 reflection = 2.0*normalVector*dot(lightDir,normalVector)-lightDir;
-  vec3 phongSpecular = vec3(pow(clamp(dot(eyeDir,reflection),0.0,1.0), SpecShine)) * lightColor;
+  
 
-  return blinnSpecular * specularType.x + phongSpecular*specularType.y ;
+  return blinnSpecular * specularType.x;
 }
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir){
