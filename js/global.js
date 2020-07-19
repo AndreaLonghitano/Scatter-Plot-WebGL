@@ -245,3 +245,51 @@ var bezier = {
 //fog
 var enable_fog=0;
 var fogColor=[208/255.0, 208/255.0, 208/255.0, 1.0];
+
+const uniforms_zero={
+ 'perspectiveLocation':'perspective',
+ 'worldViewLocation':'ModelView',
+  'materialDiffColorHandle':'mDiffColor',
+  'diffuseTypeHandle':'diffuseType',
+  'lightDirectionHandle':'L1_lightDirection',
+  'lightColorHandle':'L1_lightColor',
+  'lightPosHandle':'L1_Pos',
+  'lightDecayHandle':'lightDecayHandle',
+  'lightTargetHandle':'L1_Target',
+  'lightConeOutHandle':'L1_ConeOut',
+  'lightConeInHandle':'L1_ConeIn',
+  'lightTypeHandle':'lightType',
+  'AmbientMatColHandle':'ambientMatColor',
+  'AmbientLightColHandle':'ambientLightColor',
+  'AmbientLightLowColHandle':'ambientLightLowColor',
+  'AmbienttDirHandle':'ambientDir',
+  'AmbientTypeHandle':'ambientType',
+  'MatEmisColHandle':'emitColor',
+  'specularTypehandle':'specularType',
+  'specShineHandle':'SpecShine',
+  'specularColorHandle':'specCol',
+  'lightDirMatrixPositionHandle':'lightDirMatrix',
+  'eyePosHandler':'eyePos',
+  'textLocation':'u_texture',
+  'textureMixHandle':'texture_mix',
+  'normalMapHandle':'normalMap',
+  'heightMapHandle':'depthMap',
+  'textEnableHandle':'enable_text',
+  'nMapEnableHandle':'enable_nMap',
+  'pMapEnableHandle':'enable_pMap',
+  'enableFog':'enablefog',
+  'fogNear':'fogNear',
+  'fogFar':'fogFar',
+  'fogColor':'fogColor',
+}
+
+const uniforms_two={
+  'enableFog':'enablefog',
+  'fogNear':'fogNear',
+  'fogFar':'fogFar',
+  'fogColor':'fogColor',
+  'perspectiveLocation':'perspective',
+  'ViewLocation':'View',
+  'textLocation':'u_texture'
+
+}
