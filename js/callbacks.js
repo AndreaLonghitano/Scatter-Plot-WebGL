@@ -203,15 +203,14 @@ $('#spec_shine').on('input change', function() {
 });
 // TODO: FIX error cone_in, cone_out
 $("#cone_out").on('input change',function() {
-  if (lightConeIn <= this.value) {
-    lightConeOut=this.value;
+  if (lightConeIn < this.value) {
+    lightConeOut=parseInt(this.value);
   }
-  
 });
 
 $("#cone_in").on('input change',function(){
-  if (lightConeOut > this.value/100) {
-    lightConeIn=this.value/100;
+  if (lightConeOut > this.value) {
+    lightConeIn=parseInt(this.value);
   }
 });
 

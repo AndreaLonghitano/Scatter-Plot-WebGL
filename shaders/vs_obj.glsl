@@ -17,8 +17,9 @@ in vec2 a_uv;
 
 void main() {
   fs_uv=a_uv;
-  fsNormal = inNormal; /* le normali non le tocco perche mi vanno bene */
+  fsNormal = inNormal; /* we're in object space */
   fsPosition = (perspective*ModelView * vec4(inPosition, 1.0)).xyz;
   gl_Position = perspective*ModelView * vec4(inPosition, 1.0);
-  v_position=(ModelView*vec4(inPosition,1.0)).xyz;
+  v_position=(ModelView*vec4(inPosition,1.0)).xyz; //fog    //retrieve the position relative to the camera
+
 }

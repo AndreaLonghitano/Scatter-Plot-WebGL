@@ -38,7 +38,6 @@ function onMouseUp(ev){
                 var objSelected=$('#class'+dataset[i].class).val();
                 var ele=listOfPossibleModels[objSelected];
             
-            
                 if (ele=="Sphere"){
                     distance_hit = raySphereIntersection(rayStartPoint, normalisedRayDir, items[i], RADIUS); //in the sphere there is no need to pass the model matrix
                 }
@@ -78,13 +77,13 @@ function onMouseUp(ev){
     var l = [sphereCentre.get_x()*MULTIPLICATIVE_FACTOR - rayStartPoint[0], sphereCentre.get_y()*MULTIPLICATIVE_FACTOR - rayStartPoint[1], sphereCentre.get_z()*MULTIPLICATIVE_FACTOR - rayStartPoint[2]];
     var l_squared = l[0] * l[0] + l[1] * l[1] + l[2] * l[2];
     var r_squared=sphereRadius*sphereRadius;
-    //If this is true, the ray origin is inside the sphere so it doesn't collides
-    if(l_squared < r_squared){
+    // we're inside the sphere so it's not needed to check the intersection.. We want to detect only outisde the shere
+    if(l_squared < r_squared){ 
         return -1;
     }
     //Projection of l onto the ray direction 
     var s = l[0] * rayNormalisedDir[0] + l[1] * rayNormalisedDir[1] + l[2] * rayNormalisedDir[2];
-    //The spere is behind the ray origin so no intersection
+    
     if(s < 0){
         return -1;
     }
@@ -106,15 +105,15 @@ function onMouseUp(ev){
     var tMax=10000.0;
   
     var traslation=[ModelMatrix[3],ModelMatrix[7],ModelMatrix[11]];
-    var delta=[traslation[0]-rayStartPoint[0],traslation[1]-rayStartPoint[1],traslation[2]-rayStartPoint[2]];
+    var delta=[traslation[0]-rayStartPoint[0],traslation[1]-rayStartPoint[1],traslation[2]-rayStartPoint[2]]; // a vector directed from the centre of the camera to the centre of the cube
   
   {
       // important to normalize
       var xaxis=utils.normalizeVec3([ModelMatrix[0], ModelMatrix[4], ModelMatrix[8]]);
-      var e=  xaxis[0]*delta[0]+xaxis[1]*delta[1]+xaxis[2]*delta[2];
-      var f = ray_direction[0]*xaxis[0]+ray_direction[1]*xaxis[1]+ray_direction[2]*xaxis[2];
+      var e=  xaxis[0]*delta[0]+xaxis[1]*delta[1]+xaxis[2]*delta[2]; //  scalar product // project the del
+      var f = ray_direction[0]*xaxis[0]+ray_direction[1]*xaxis[1]+ray_direction[2]*xaxis[2]; //scalar product project the ray in the xaxis
   
-          if ( Math.abs(f) > 0.001 ){ // Standard case
+          if ( Math.abs(f) > 0.001 ){ // otherwise it means they'are parallel
   
               var t1 = (e+aabb_min[0])/f; // Intersection with the "left" plane
               var t2 = (e+aabb_max[0])/f; // Intersection with the "right" plane
@@ -123,19 +122,16 @@ function onMouseUp(ev){
               // We want t1 to represent the nearest intersection, 
               // so if it's not the case, invert t1 and t2
               if (t1>t2){
-          var w=t1;
-          var t1=t2;
-          var t2=w; // swap t1 and t2
+                var w=t1;
+                var t1=t2;
+                var t2=w; // swap t1 and t2
               }
   
               // tMax is the nearest "far" intersection (amongst the X,Y and Z planes pairs)
-              if ( t2 < tMax )
-                  tMax = t2;
+              if ( t2 < tMax ) tMax = t2;
               // tMin is the farthest "near" intersection (amongst the X,Y and Z planes pairs)
-              if ( t1 > tMin )
-                  tMin = t1;
+              if ( t1 > tMin ) tMin = t1;
   
-              // And here's the trick :
               // If "far" is closer than "near", then there is NO intersection.
               // See the images in the tutorials for the visual explanation.
               if (tMax < tMin )
@@ -146,12 +142,13 @@ function onMouseUp(ev){
                   return -1;
       }
     }
+    
       {
       var yaxis=utils.normalizeVec3([ModelMatrix[1], ModelMatrix[5], ModelMatrix[9]]); //nuovo asse y
       var e=  yaxis[0]*delta[0]+yaxis[1]*delta[1]+yaxis[2]*delta[2];
       var f = ray_direction[0]*yaxis[0]+ray_direction[1]*yaxis[1]+ray_direction[2]*yaxis[2];
   
-          if ( Math.abs(f) > 0.001 ){ // Standard case
+          if ( Math.abs(f) > 0.001 ){ // otherwise it means they'are parallel
   
               var t1 = (e+aabb_min[1])/f; // Intersection with the "left" plane
               var t2 = (e+aabb_max[1])/f; // Intersection with the "right" plane
@@ -160,9 +157,9 @@ function onMouseUp(ev){
               // We want t1 to represent the nearest intersection, 
               // so if it's not the case, invert t1 and t2
               if (t1>t2){
-          var w=t1;
-          var t1=t2;
-          var t2=w; // swap t1 and t2
+                    var w=t1;
+                    var t1=t2;
+                    var t2=w; // swap t1 and t2
               }
   
               // tMax is the nearest "far" intersection (amongst the X,Y and Z planes pairs)
@@ -172,9 +169,8 @@ function onMouseUp(ev){
               if ( t1 > tMin )
                   tMin = t1;
   
-              // And here's the trick :
+              
               // If "far" is closer than "near", then there is NO intersection.
-              // See the images in the tutorials for the visual explanation.
               if (tMax < tMin )
                   return -1;
   
@@ -210,9 +206,7 @@ function onMouseUp(ev){
               if ( t1 > tMin )
                   tMin = t1;
   
-              // And here's the trick :
               // If "far" is closer than "near", then there is NO intersection.
-              // See the images in the tutorials for the visual explanation.
               if (tMax < tMin )
                   return -1;
   

@@ -6,9 +6,8 @@ in vec3 fsNormal;
 in vec3 fsPosition;
 out vec4 outColor;
 
+uniform vec4 eyePos;
 
-
-uniform mat4 lightDirMatrix;
 
 uniform vec4 ambientType;
 uniform vec4 diffuseType;
@@ -24,8 +23,6 @@ uniform vec3 ambientMatColor;
 uniform vec3 ambientLightColor;
 uniform vec3 ambientLightLowColor;
 uniform vec3 ambientDir;
-
-uniform vec4 eyePos;
 
 //diffuse
 uniform vec3 mDiffColor;
@@ -75,7 +72,7 @@ vec3 computeLightDir(vec3 lightPos, vec3 lightDir) {
 
 vec3 computeLightColor(vec3 lightPos){
   float LCosOut = cos(radians(L1_ConeOut / 2.0));
-	float LCosIn = cos(radians(L1_ConeOut * L1_ConeIn / 2.0));
+	float LCosIn = cos(radians(L1_ConeIn / 2.0));
 
   //Direct
 	vec3 directLightCol = L1_lightColor;

@@ -115,15 +115,14 @@
 
 
   //compute eprspective matrix
-  perspectiveMatrix = utils.MakePerspective(90, gl.canvas.width / gl.canvas.height, 0.1, 1000);
+  perspectiveMatrix = utils.MakePerspective(90, gl.canvas.width / gl.canvas.height, 0.1, 1300);
 
 
   //create all the vertex array objects
   createVaoObjects(programs[0], "Sphere", vertices = sphere.vertices, normals = sphere.vertexNormals, indices = sphere.indices, uv = sphere.textures);
   createVaoObjects(programs[0], "Cube", vertices = cube.vertices, normals = cube.vertexNormals, indices = cube.indices, uv = cube.textures);
   createVaoObjects(programs[1], "Lines", lines_position);
-  var positions = setGeometry(500);
-  createVaoObjects(programs[2], "Skybox", vertices = positions);
+  createVaoObjects(programs[2], "Skybox", vertices = setGeometry(500));
   pyramid = buildPyramid();
   createVaoObjects(programs[1], "Pyramid", vertices = pyramid.vertices, normals = undefined, indices = pyramid.indices);
   listOfPossibleModels = Object.keys(vao);
@@ -145,11 +144,9 @@ var updateScene = function () {
 function drawScene() {
 
   resize(gl.canvas);
-  gl.clearColor(0.85, 0.85, 0.85, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.CULL_FACE);
-  gl.enable(gl.POLYGON_OFFSET_FILL);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   computeViewMatrix();
   showAxes();
@@ -212,7 +209,7 @@ function drawScene() {
 
       setUniformObjects(worldViewMatrix,centroid_colors[i],eyePosTransformed,lightPosTransformed,directionalLightTrasformed,ambientLightDirTransformed,true)
 
-      gl.bindVertexArray(vao[shape]); // va bene metterlo qui prima di diseganre
+      gl.bindVertexArray(vao[shape]); 
       gl.drawElements(gl.TRIANGLES, models[shape].indices.length, gl.UNSIGNED_SHORT, 0);
     }
 
@@ -455,12 +452,10 @@ function computeViewMatrix() {
   zaxis = [dvecmat[2], dvecmat[6], dvecmat[10]];
 
 
-  if ((rvx != 0) || (rvy != 0) || (rvz != 0)) {
+  if ((rvx != 0) || (rvy != 0)) {
     qx = Quaternion.fromAxisAngle(xaxis, utils.degToRad(rvx * 1));
     qy = Quaternion.fromAxisAngle(yaxis, utils.degToRad(rvy * 1));
-    qz = Quaternion.fromAxisAngle(zaxis, utils.degToRad(rvz * 1));
-    newDvecmat = utils.multiplyMatrices(utils.multiplyMatrices(utils.multiplyMatrices(
-      qy.toMatrix4(), qx.toMatrix4()), qz.toMatrix4()), dvecmat);
+    newDvecmat = utils.multiplyMatrices(utils.multiplyMatrices(qy.toMatrix4(), qx.toMatrix4()), dvecmat);
     R11 = newDvecmat[10]; R12 = newDvecmat[8]; R13 = newDvecmat[9];
     R21 = newDvecmat[2]; R22 = newDvecmat[0]; R23 = newDvecmat[1];
     R31 = newDvecmat[6]; R32 = newDvecmat[4]; R33 = newDvecmat[5];

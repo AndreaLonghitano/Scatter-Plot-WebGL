@@ -19,5 +19,6 @@ void main() {
   v_normal = normalize(a_position.xyz);
 
   // fog
+  //retrieve the position relative to the camera
   v_position= (View*a_position).xyz;
 }

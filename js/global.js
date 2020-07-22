@@ -107,17 +107,20 @@ var viewMatrix;
 var dirLightAlpha = -utils.degToRad($("#alfa_light").val());
 var dirLightBeta  = -utils.degToRad($("#beta_light").val());
 
-var directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
-            Math.sin(dirLightAlpha),
-            Math.cos(dirLightAlpha) * Math.sin(dirLightBeta)
+
+
+var directionalLight = [Math.sin(dirLightAlpha) * Math.sin(dirLightBeta),
+            Math.cos(dirLightAlpha),
+            Math.sin(dirLightAlpha) * Math.cos(dirLightBeta)
             ];
+
 var directionalLightColor = [1.0, 1.0, 1.0];
 
 var dirLightPos_x = 0.0;
 var dirLightPos_y = 0.0;
 var dirLightPos_z = 0.0;
-var lightConeOut = document.getElementById("cone_out").value/360*3.14;
-var lightConeIn = document.getElementById("cone_in").value/100;
+var lightConeOut = parseInt($("#cone_out").val());
+var lightConeIn = parseInt($("#cone_in").val());
 var lightDecay = 0;
 var lightTarget = 61;
 
