@@ -203,15 +203,19 @@ $('#spec_shine').on('input change', function() {
 });
 // TODO: FIX error cone_in, cone_out
 $("#cone_out").on('input change',function() {
-  if (lightConeIn < this.value) {
-    lightConeOut=parseInt(this.value);
-  }
+  
+  lightConeOut=parseInt(this.value);
+  console.log(lightConeOut)
+  console.log(lightConeIn);
 });
 
 $("#cone_in").on('input change',function(){
-  if (lightConeOut > this.value) {
-    lightConeIn=parseInt(this.value);
-  }
+  
+  lightConeIn=parseInt(this.value)/100;
+  console.log(lightConeOut);
+  console.log(lightConeIn);
+  //console.log(typeof(lightConeIn));
+  
 });
 
 $("#x_light").on('input change',function(){

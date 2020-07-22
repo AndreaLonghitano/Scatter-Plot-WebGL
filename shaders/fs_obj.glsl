@@ -72,7 +72,7 @@ vec3 computeLightDir(vec3 lightPos, vec3 lightDir) {
 
 vec3 computeLightColor(vec3 lightPos){
   float LCosOut = cos(radians(L1_ConeOut / 2.0));
-	float LCosIn = cos(radians(L1_ConeIn / 2.0));
+	float LCosIn = cos(radians(L1_ConeOut*L1_ConeIn / 2.0));
 
   //Direct
 	vec3 directLightCol = L1_lightColor;

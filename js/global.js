@@ -120,7 +120,7 @@ var dirLightPos_x = 0.0;
 var dirLightPos_y = 0.0;
 var dirLightPos_z = 0.0;
 var lightConeOut = parseInt($("#cone_out").val());
-var lightConeIn = parseInt($("#cone_in").val());
+var lightConeIn = parseInt($("#cone_in").val())/100;
 var lightDecay = 0;
 var lightTarget = 61;
 
