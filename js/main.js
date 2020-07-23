@@ -88,8 +88,6 @@
   cube = new OBJ.Mesh(cubeObjStr);
   sphereObjStr = await utils.get_objstr(baseDir + "/model/sphere_1.obj");
   sphere = new OBJ.Mesh(sphereObjStr);
-  diamondObjStr = await utils.get_objstr(baseDir + "/model/diamond.obj");
-  diamond = new OBJ.Mesh(diamondObjStr);
   models = { 'Cube': cube, 'Sphere': sphere };
 
   // get all the attribute location for each program
